@@ -17,8 +17,8 @@ support/JDBC/test support 0.4.0. Tests use each IDE's bundled runtime.
 
 The standard suite passes 72 tests per runtime with zero failures/errors/skips,
 432 executions across the two Kotlin modes. The latest local pass is recorded in
-`build/nap/editor-runtime-matrix.log`; preserved XML and checked summaries are under
-`build/nap/editor-matrix-absent/` and `editor-matrix-present/`.
+`build/nap/final-validation.log`; clean-commit XML and checked summaries are under
+`build/nap/final-matrix-absent/` and `final-matrix-present/`.
 The global physical-reference search was also rerun on all three runtimes in
 `build/nap/physical-indexed-matrix.log` and `physical-indexed-xml/`.
 The earlier 63-test lifecycle evidence remains under `build/lifecycle/`.
@@ -201,6 +201,10 @@ files stayed unchanged. All 12 executions pass with zero failures/errors/skips.
 Reports: `build/lifecycle/installed-isolation.log` and `installed-isolation/`.
 The older archived ZIP pass remains under `build/readiness/isolation-results/`.
 Neither pass establishes every possible wrapper registration permutation.
+The final clean `17ad87d` checkpoint repeated all 12 installed-peer executions
+successfully. The installed files and snapshot ZIP hashes were rechecked unchanged
+in `build/nap/installed-peers-recheck.json`. Final XML and checked counts are under
+`build/nap/final-installed-isolation/`.
 
 ## Fresh full Plugin Verifier audit
 
@@ -231,65 +235,37 @@ neither Arrow JDBC, test support, Kotlin stdlib nor a serialization runtime copy
 Run `./gradlew dogfoodZip` for the current Git-derived ZIP path and checksum; do
 not pick an older ZIP merely because it is first in a directory listing.
 
-CI follows the peers' checkout/JDK/Gradle/runtime/build/artifact flow.
-[Hosted run 41696634679](https://github.com/sort-dev/datafusion-spice-intellij-plugin/actions/runs/41696634679)
-passed on editor/cancellation checkpoint `599c27a`, including the 72-test suite in
-both Kotlin modes on all three runtimes and distribution/artifact checks.
+CI follows the peers' checkout/JDK/Gradle/runtime/build/artifact flow and preserves
+each Kotlin mode's raw XML and checked summaries separately. Six Python tests
+cover the snapshot helper. See [test-evidence.md](test-evidence.md).
+[Hosted run 41699614216](https://github.com/sort-dev/datafusion-spice-intellij-plugin/actions/runs/41699614216)
+passed on final implementation `17ad87d`. The downloaded artifact independently
+confirms 72 passing tests on each runtime in both Kotlin modes, zero
+failures/errors/skips, and the exact clean implementation commit in each summary.
+The hosted verifier was skipped/manual-only. Status and downloaded XML are in
+`build/nap/final-hosted-status.json` and `final-ci-artifacts/`.
+Earlier successful checkpoint runs and old ZIP hashes are retained in
+[earlier delivery evidence](archive/earlier-delivery-evidence.md), not offered as
+the current install recommendation. The hosted verifier remains manual-only;
+there is no publication job.
 
-Earlier console evidence:
-[Hosted run 41693793919](https://github.com/sort-dev/datafusion-spice-intellij-plugin/actions/runs/41693793919)
-passed on console/evidence checkpoint `3410a54b15e7d67669d823c136f45e0ca3c9cf2b`.
-Its downloaded artifact contains both Kotlin modes' 67-test three-runtime XML and
-checked summaries. The six Python evidence-tool tests also pass.
-
-Earlier identity evidence:
-[Hosted run 41692113541](https://github.com/sort-dev/datafusion-spice-intellij-plugin/actions/runs/41692113541)
-passed on first-connection identity implementation `7ece225e76cc424c273668e84221f4c21065deb1`,
-including both Kotlin modes on all three runtimes and packaging/artifacts.
-CI now preserves separate mode-specific raw XML and summaries before the next
-mode overwrites Gradle's output. The snapshot helper has six passing Python tests.
-See [test-evidence.md](test-evidence.md).
-
-Earlier lifecycle evidence:
-[Hosted run 41688372935](https://github.com/sort-dev/datafusion-spice-intellij-plugin/actions/runs/41688372935)
-passed on lifecycle implementation commit `5f7b4ea2e509b23b722f374e1797bcd7197b1f25`.
-Both Kotlin modes on 261/262/263, packaging/distribution checks and artifact uploads
-succeeded. The hosted verifier was skipped because it is manual-only. The five
-compatible verdicts above are the separate local audit.
-
-Earlier baseline evidence:
-[Hosted run 41673732794](https://github.com/sort-dev/datafusion-spice-intellij-plugin/actions/runs/41673732794)
-passed on implementation commit `f656bae740f68e599fd493dfca74fc9f0dec2a49`:
-the three-runtime matrix with Kotlin absent and present, build/distribution
-verification and ZIP/test-artifact uploads all succeeded. The hosted verifier job
-is manual-only and was skipped on this push; the five verdicts above are the
-separate local audit, not a hosted verifier result. There is no publication job.
-
-The previous clean local dogfood built from `f656bae` is
-`datafusion-spice-intellij-plugin-0.1.0-dev.202611031623+f656bae740f6.zip`, SHA-256
-`f8853a50fecec325d3670356be30378f1d001dcae94f4c70ee79ecfcd9379387`.
-All 124 runtime-payload entries match the audited dirty build after normalizing
-only the exact build-version fields in the descriptor/manifest. The comparison
-record is `build/readiness/clean-payload-equivalence.json`; this is payload
-equivalence, not a newly relabeled Plugin Verifier run. The final clean build also
-passed all 50 tests in an isolated runtime using installed IDE build 262.9437.185.
-
-The lifecycle follow-up also passes all 63 tests in an isolated runtime of that
-installed IDE, using `-Ptest.ide262=/home/jayson/.local/share/JetBrains/Toolbox/apps/intellij-idea`.
-Evidence is `build/lifecycle/installed-runtime.log` and `installed-runtime/`.
-
-The clean lifecycle dogfood ZIP from `5f7b4ea` is
-`datafusion-spice-intellij-plugin-0.1.0-dev.202611031752+5f7b4ea2e509.zip`, SHA-256
-`1fa8cddff46c09499f31c103b0b21658d812d7741fc25120c369acaeff8005ee`.
-All 125 normalized runtime-payload entries match the latest audited dirty build.
+The current clean dogfood ZIP from implementation `17ad87dd194e0dca53c120aeba0cbd14c802249f` is
+`datafusion-spice-intellij-plugin-0.1.0-dev.202611031903+17ad87dd194e.zip`, SHA-256
+`b176b30b217ce4c672a03b72735c14684f7bbda9b87e793eb8d91f83128e83e8`.
+All 127 normalized runtime-payload entries match the identity-fix verifier input.
 Only the main JAR filename and exact descriptor/manifest build-version fields were
-normalized. Evidence: `build/lifecycle/clean-payload-equivalence.json`.
-That clean build also passes 63 tests on installed IDE 262.9437.185 and distribution
-verification, recorded in `build/lifecycle/clean-installed-runtime.log`.
+normalized. Evidence: `build/nap/clean-payload-equivalence.json`. This proves payload
+equivalence, not a newly relabeled verifier run or API approval.
 
-The user's live editor symptoms, actual driver dialog/process, clean interactive
-installs, production TLS/auth policy, cross-library cache migration and endpoint
-scope remain open in [TODO.md](TODO.md). The installed IDE 262.9437.185 was tested
-earlier in an isolated runtime lane, not controlled as a live UI. Reconnection and
-schema/model behavior still need actual dogfooding. Namespace-changing SQL remains
-disabled; readback and default-scope selection are separate from a USE guarantee.
+That clean commit passed the 432-execution matrix, 12 peer-isolation executions,
+distribution verification and all 72 tests in an isolated Kotlin-absent runtime of
+installed IntelliJ 2026.2.1 / 262.9437.185. The summaries record the exact clean
+commit and an empty worktree status. Installed-IDE metadata and XML are in
+`build/nap/final-installed-ide.json` and `final-installed-runtime/`.
+
+The user's live-window symptoms, driver-dialog upgrades, clean interactive installs,
+production TLS/auth policy, cross-library cache migration and full DataFusion
+tree contract remain open in [TODO.md](TODO.md). The installed IDE was tested in
+an isolated runtime, not controlled as a live UI. Broader reconnect/removal/disposal
+ordering and schema/model UI behavior still need qualification. Namespace-changing
+SQL remains disabled; readback and scope selection are separate from a USE guarantee.

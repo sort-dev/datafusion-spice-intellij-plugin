@@ -28,8 +28,9 @@ not establish the live editor/connection experience.
   Consumer caller-cancellation now closes a held synthetic metadata statement
   without seeding scope. That does not bound real server cancellation, namespace
   probes or RPC cleanup when a driver ignores cancel.
-- [ ] Cover fresh-process/cross-version cache migration, out-of-band metadata
-  changes, stale in-flight refresh and reconnect/disposal in the consumer. Native
+- [ ] Qualify cross-library cache-format migration, same-identity concurrent
+  refresh/removal, arbitrary out-of-band metadata changes and reconnect/disposal
+  ordering in the consumer. Native
   inventory disk round-trip and memory-only session behavior are now tested under
   each IDE runtime, but that is narrower than this full lifecycle gate.
   This pass adds separate writer/reader JVMs and connection-identity race checks;
@@ -149,6 +150,10 @@ not establish the live editor/connection experience.
   Console/evidence checkpoint 3410a54 passed CI 41693793919; its downloaded artifact
   contains both modes' raw XML. Editor/cancellation checkpoint 599c27a passed CI
   41696634679 with 72 tests per runtime in each mode.
+  Final implementation 17ad87d passed CI 41699614216; downloaded artifacts confirm
+  both 72-test modes on all runtimes. Its clean local ZIP also passed 432 matrix
+  executions, 12 current-peer isolation checks and 72 tests on installed IDE
+  262.9437.185. API/publication and live-window gates remain open.
 - [x] Remove version-blind transport banners/statement warnings. README names the
   observed versions, actual upstream owners and issue links instead.
 
