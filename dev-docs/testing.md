@@ -15,14 +15,25 @@ support/JDBC/test support 0.4.0. Tests use each IDE's bundled runtime.
 ./gradlew test test262 test263 -Ptest.kotlin=present
 ```
 
-The standard suite passes 67 tests per runtime with zero failures/errors/skips,
-402 executions across the two Kotlin modes. The latest local pass is recorded in
-`build/nap/identity-matrix.log` and `build/nap/identity-present.log`;
-preserved XML is under `build/nap/identity-matrix/` and `identity-present/`.
+The standard suite passes 72 tests per runtime with zero failures/errors/skips,
+432 executions across the two Kotlin modes. The latest local pass is recorded in
+`build/nap/editor-runtime-matrix.log`; preserved XML and checked summaries are under
+`build/nap/editor-matrix-absent/` and `editor-matrix-present/`.
+The global physical-reference search was also rerun on all three runtimes in
+`build/nap/physical-indexed-matrix.log` and `physical-indexed-xml/`.
 The earlier 63-test lifecycle evidence remains under `build/lifecycle/`.
 The configured builds are 261.25134.95, 262.10968.63 and 263.5701.42.
 
 Coverage now includes:
+
+- Project-backed physical-column ReferencesSearch across same-named tables in two
+  schemas, and reference-only SQL rename that does not mutate the database model.
+- Both explicit tagged-dollar injected dialects, Unicode host ranges, local parse
+  errors and registered function completion insertion that preserves the host.
+- Caller cancellation through both actual consumer hooks and the released
+  harvester at a held synthetic remote statement. Cancel/close, no namespace
+  readback and no scope/cache seeding are required. This is not a real-server/RPC
+  cancellation bound. See [editor-and-cancellation-qualification.md](editor-and-cancellation-qualification.md).
 
 - Actual consumer-hook/shared-harvester lifecycle checks for both products. URL
   edits during harvesting or namespace readback and a foreign-driver switch must
@@ -59,8 +70,11 @@ Coverage now includes:
 The suite captures background logged errors. Live server and isolated-loader
 classes are excluded from this normal matrix and run separately below.
 
-The first-connection identity fix adds four standard identity checks. Both Kotlin
-modes pass on all three runtimes; earlier evidence is preserved, not relabeled.
+The first-connection identity fix adds four standard identity checks, and the
+editor/cancellation pass adds five. Both Kotlin modes pass on all three runtimes;
+earlier evidence is preserved, not relabeled. The DataGrip headless probe stopped
+before tests because shared conventions require an unavailable Java host plugin.
+That limitation is recorded separately; no DataGrip consumer-suite pass is claimed.
 
 ## Real disposable Flight SQL fixtures
 
@@ -210,6 +224,12 @@ Run `./gradlew dogfoodZip` for the current Git-derived ZIP path and checksum; do
 not pick an older ZIP merely because it is first in a directory listing.
 
 CI follows the peers' checkout/JDK/Gradle/runtime/build/artifact flow.
+[Hosted run 41693793919](https://github.com/sort-dev/datafusion-spice-intellij-plugin/actions/runs/41693793919)
+passed on console/evidence checkpoint `3410a54b15e7d67669d823c136f45e0ca3c9cf2b`.
+Its downloaded artifact contains both Kotlin modes' 67-test three-runtime XML and
+checked summaries. The six Python evidence-tool tests also pass.
+
+Earlier identity evidence:
 [Hosted run 41692113541](https://github.com/sort-dev/datafusion-spice-intellij-plugin/actions/runs/41692113541)
 passed on first-connection identity implementation `7ece225e76cc424c273668e84221f4c21065deb1`,
 including both Kotlin modes on all three runtimes and packaging/artifacts.

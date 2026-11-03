@@ -25,6 +25,9 @@ not establish the live editor/connection experience.
   is not a Password Safe or driver-dialog test. DataFusion's fixture handshake is
   not a production authorization policy. Do not run dangerous leak/failure probes
   in the user's IDE or claim unsupported operations work.
+  Consumer caller-cancellation now closes a held synthetic metadata statement
+  without seeding scope. That does not bound real server cancellation, namespace
+  probes or RPC cleanup when a driver ignores cancel.
 - [ ] Cover fresh-process/cross-version cache migration, out-of-band metadata
   changes, stale in-flight refresh and reconnect/disposal in the consumer. Native
   inventory disk round-trip and memory-only session behavior are now tested under
@@ -32,15 +35,21 @@ not establish the live editor/connection experience.
   This pass adds separate writer/reader JVMs and connection-identity race checks;
   cross-library-format migration and same-identity concurrent refresh/removal
   semantics remain separate gates, not implied by those tests.
-- [ ] Expand physical-column rename/find-usages and injected-host coverage.
-  Navigation to loaded model columns is now checked in the no-edit introspection
-  fixtures. Function docs/links, named-option insertion, local alias rename and
-  explicit dollar-string injection have regression tests. The stock PostgreSQL
-  single-quoted host fixture retained doubled quote escapes; do not treat that as
-  qualified host decoding or add automatic Kotlin recognition as a local fix.
+- [ ] Qualify database-DDL rename UI and broaden quoted physical-column/host
+  coverage. Indexed physical-column find usages and reference-only rename now
+  keep same-named schema columns and string literals separate. Both explicitly
+  injected dialects have tagged-dollar Unicode/error/completion-insertion checks.
+  Those do not qualify database mutation or automatic host recognition. The stock
+  PostgreSQL single-quoted host fixture retained doubled quote escapes; do not
+  treat that as qualified host decoding or add automatic Kotlin recognition as a fix.
 
 ## Decisions and release gates
 
+- [ ] Obtain a reviewed DataGrip consumer-test lane in shared conventions. The
+  DataGrip 262 attempt fails before tests because the convention always requests
+  the unavailable bundled Java host plugin. Do not edit vendored build logic or
+  transplant IDEA's Java plugin to disguise this gap. Verifier compatibility is
+  separate from an executed DataGrip consumer suite.
 - [ ] Review the current API audit before publication: 1 internal factory
   reference, 11 experimental usages and 1 deprecated model-helper override per
   audited IDE. Three experimental references are in ProductHarvest; capturing the
@@ -111,6 +120,9 @@ not establish the live editor/connection experience.
   with real IntelliJ metadata/resource lookup tests.
 - [x] Function documentation/link, named-argument insertion, alias rename and
   explicit injected SQL parser/Unicode-offset regressions.
+- [x] Indexed physical-column references across same-named tables in different
+  schemas, reference-only SQL rename, tagged-dollar injected completion insertion
+  for both products, and actual consumer-hook cancellation at a recorded boundary.
 - [x] Isolated private Brikk copies and cooperative Execute chains with four
   archived peer ZIPs and snapshots of current installed ClickHouse/Doris/DuckDB/
   Trino payloads on 261/262/263; four checks per runtime pass in each set. Snapshot

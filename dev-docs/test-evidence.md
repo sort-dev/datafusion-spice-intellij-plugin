@@ -32,3 +32,9 @@ command with missing or skipped evidence cannot silently pass the snapshot gate.
 The original test step's failure is also retained. Six Python tests cover counts,
 raw copies, immutable destinations, partial/malformed reports, failures/skips and
 the CLI exit status. No third-party Python packages are required.
+
+[Hosted run 41693793919](https://github.com/sort-dev/datafusion-spice-intellij-plugin/actions/runs/41693793919)
+passed on `3410a54`. The downloaded test-results artifact contains separate
+Kotlin-absent and Kotlin-present snapshots, each with 67 passing tests on all
+three runtimes. This was checked from the artifact's raw XML/summaries, not just
+the job status. The local download is `build/nap/console-ci-artifacts/`.
