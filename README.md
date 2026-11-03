@@ -19,21 +19,55 @@ The DataFusion and Spice data-source templates use Apache Arrow Flight SQL JDBC
 DataFusion is an embedding library, not a universal server: a deployment must expose
 the Flight SQL and information-schema contract used by this plugin.
 
-Driver JVM options include `--add-opens=java.base/java.nio=ALL-UNNAMED`.
-For a Java 25 driver runtime, also add
-`--sun-misc-unsafe-memory-access=allow` in the driver's VM options. Do not change
-the IDE's global VM options.
+After connecting, the plugin reads the current catalog and schema. A new data
+source's unset introspection scope selects that reported default namespace;
+existing schema selections are preserved. Completion and SQL references can
+request unloaded namespaces as you type or open a query. Catalog changes restart
+editor analysis without requiring a text edit.
+
+Both driver templates define the required VM options. In **Data Sources and
+Drivers**, select the **Drivers** tab, then **Spice (sort.dev)** or
+**DataFusion (sort.dev)**, then **Advanced**. For a Java 25 driver runtime, the
+driver's **VM options** should contain:
+
+```text
+--add-opens=java.base/java.nio=ALL-UNNAMED --sun-misc-unsafe-memory-access=allow
+```
+
+The **connection's** Advanced VM options field may be blank: it shows extra
+connection-specific options, not the inherited driver options. Database Tools
+combines both when launching the driver, so you do not need to copy the flags
+into every connection.
+
+If you customized the driver before upgrading, the IDE preserves that saved
+override. If the **driver-level** value is blank or incomplete, replace it with
+the full value above once; all connections using that driver then inherit it.
+These are database driver options, not project or global IDE VM options.
+If you deliberately use a Java 21 driver runtime, use only the `--add-opens` option.
 
 ## Limits
 
 SQL checks are local. The plugin does not prepare statements, run EXPLAIN or execute
 your queries in the background to validate them.
 
-Spice's qualified Flight SQL transport has known limitations with SQL
-PREPARE/EXECUTE/DEALLOCATE, SET, no-result updates and NULL JDBC parameters.
-A returned update count of zero does not prove a statement ran. Failed JDBC
-parameter binding can leak driver-process memory. Native SQL execution follows
-Database Tools; editor support does not guarantee transport execution support.
+### Upstream issues observed with Spice 2.4.0 and Arrow JDBC 19.0.0
+
+These are upstream server/driver issues, not errors reported by this plugin:
+
+- **Spice server:** some errors and SQL PREPARE/EXECUTE/DEALLOCATE operations can
+  return an empty schema or a misleading zero update count. See
+  [#15944](https://github.com/spiceai/spiceai/issues/15944),
+  [#15946](https://github.com/spiceai/spiceai/issues/15946) and
+  [#15948](https://github.com/spiceai/spiceai/issues/15948).
+- **Spice server:** incorrect parameter nullability can make NULL JDBC bindings
+  fail. See [#15950](https://github.com/spiceai/spiceai/issues/15950).
+- **Apache Arrow JDBC driver:** failed parameter binding can leak driver-process
+  memory. See [#1439](https://github.com/apache/arrow-java/issues/1439).
+
+These observations concern those versions, not every later release. The plugin
+does not display an editor banner or mark SQL as faulty because of these issues,
+and it does not determine whether a user-installed driver/server contains a fix.
+Database Tools reports actual execution results and driver/server errors.
 
 Bundled metadata covers DataFusion 55.2.0 and Spice 2.4.0. Other versions receive
 labeled fallback metadata, not an exact-version support claim. Live inventories
@@ -41,3 +75,13 @@ keep the two products and their versions separate. Database-tree coverage depend
 on the endpoint's JDBC metadata support.
 
 Local development builds are not a published or fully qualified production release.
+
+## Brikk PIPE
+
+Enable either product independently under **Settings > Tools > Database >
+DataFusion Brikk PIPE** or **Spice Brikk PIPE**. Both are off by default.
+
+The editor popup offers generated-SQL preview and run-to-stage. Brikk PIPE lowers
+supported stages to SQL for the selected product; it is not a promise of native
+pipe-syntax support. Preview states that native server verification is unavailable.
+Transport limitations still apply to the generated SQL.

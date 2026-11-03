@@ -1,0 +1,18 @@
+<drivers>
+    <!-- Product selection is explicit. The shared URL scheme is not a product detector. -->
+    <driver id="datafusion-brikk-flight" name="DataFusion (sort.dev)" dialect="DataFusionSQL"
+            forced-dbms="DATAFUSION_BRIKK" driver-class="org.apache.arrow.driver.jdbc.ArrowFlightJdbcDriver">
+        <!-- DataFusion embeddings have no universal port; supply the deployment's Flight port. -->
+        <url-template name="default" template="jdbc:arrow-flight-sql://{host::localhost}[:{port}][/\?&lt;&amp;,user={user:param},password={password:param},useEncryption={useEncryption:param:true},{:identifier}={:param}&gt;]"/>
+        <vm-options>--add-opens=java.base/java.nio=ALL-UNNAMED --sun-misc-unsafe-memory-access=allow</vm-options>
+        <artifact name="Arrow Flight SQL JDBC (Brikk)" use="true" rolling="true"/>
+        <option name="auto-sync" value="true"/>
+    </driver>
+    <driver id="spice-brikk-flight" name="Spice (sort.dev)" dialect="SpiceSQL"
+            forced-dbms="SPICE_BRIKK" driver-class="org.apache.arrow.driver.jdbc.ArrowFlightJdbcDriver">
+        <url-template name="default" template="jdbc:arrow-flight-sql://{host::localhost}[:{port::50051}][/\?&lt;&amp;,user={user:param},password={password:param},useEncryption={useEncryption:param:true},{:identifier}={:param}&gt;]"/>
+        <vm-options>--add-opens=java.base/java.nio=ALL-UNNAMED --sun-misc-unsafe-memory-access=allow</vm-options>
+        <artifact name="Arrow Flight SQL JDBC (Brikk)" use="true" rolling="true"/>
+        <option name="auto-sync" value="true"/>
+    </driver>
+</drivers>

@@ -1,0 +1,23 @@
+package dev.sort.datafusionspice.sql
+
+import com.intellij.sql.dialects.base.SqlSyntaxHighlighterFactory
+import dev.brikk.house.sql.intellij.completion.SqlBuiltinPrototypeFilter
+import dev.brikk.house.sql.intellij.completion.SqlCompletionContributor
+import dev.brikk.house.sql.intellij.completion.DatafusionArgumentCompletion
+import dev.brikk.house.sql.intellij.dialect.DatafusionFunctionAnnotator
+import dev.brikk.house.sql.intellij.docs.DatafusionDocumentationProvider
+import dev.brikk.house.sql.intellij.parser.DatafusionFamilyParserDefinition
+import dev.brikk.house.sql.intellij.relation.*
+
+class SpiceParserDefinition : DatafusionFamilyParserDefinition(SpiceSqlDialect)
+class SpiceSyntaxHighlighterFactory : SqlSyntaxHighlighterFactory.Base(SpiceSqlDialect)
+class SpiceArguments : DatafusionArgumentCompletion(SpiceSqlDialect.editorProfile)
+class SpiceBuiltinFilter : SqlBuiltinPrototypeFilter(SpiceSqlDialect.editorProfile)
+class SpiceRelationCompletion : ExternalRelationCompletionContributor(SpiceSqlDialect.editorProfile)
+class SpiceMetadataCompletion : SqlCompletionContributor(SpiceSqlDialect.editorProfile)
+class SpiceDocumentation : DatafusionDocumentationProvider(SpiceSqlDialect.editorProfile)
+class SpiceRelationResolve : ExternalRelationResolveExtension(SpiceSqlDialect.editorProfile)
+class SpiceRelationNavigation : ExternalRelationGotoDeclarationHandler(SpiceSqlDialect.editorProfile)
+class SpiceRelationAnnotator : ExternalRelationAnnotator(SpiceSqlDialect.editorProfile)
+class SpiceFunctionCheck : DatafusionFunctionAnnotator(SpiceSqlDialect.editorProfile)
+class SpiceRelationSuppressor : ExternalRelationInspectionSuppressor(SpiceSqlDialect.editorProfile)

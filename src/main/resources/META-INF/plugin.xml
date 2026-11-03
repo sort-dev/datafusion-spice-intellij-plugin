@@ -1,0 +1,112 @@
+<idea-plugin xmlns:xi="http://www.w3.org/2001/XInclude">
+    <id>dev.sort.datafusion-spice-intellij-plugin</id>
+    <name>SQL Dialects for DataFusion &amp; Spice</name>
+    <vendor url="https://sort.dev" email="jayson@sort.dev">Sortdev SRL</vendor>
+    <description><![CDATA[
+        <p>Separate Apache DataFusion and Spice SQL dialects for DataGrip and IntelliJ IDEA
+        with Database Tools, on IDE builds 261 through 263.</p>
+        <ul>
+            <li>Product-specific parsing, highlighting, completion, documentation and local diagnostics.</li>
+            <li>Independent live catalog inventories and explicit catalog refresh actions.</li>
+            <li>Product-specific Apache Arrow Flight SQL JDBC connection templates.</li>
+            <li>Optional, off-by-default Brikk PIPE preview and execution for each product.</li>
+        </ul>
+        <p>Background native verification is unavailable. Connection behavior depends on the
+        installed JDBC driver and server. See the README for version-specific upstream limitations.
+        DataFusion deployments must expose the required Flight SQL and information-schema contract.</p>
+        <p>This independent Sortdev SRL plugin is not affiliated with or endorsed by the
+        Apache Software Foundation, Apache DataFusion, Apache Arrow or Spice.ai.</p>
+    ]]></description>
+    <change-notes><![CDATA[<p>Initial local development build with separate DataFusion and Spice identities.</p>]]></change-notes>
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.database</depends>
+    <xi:include href="/META-INF/datafusion-spice-pipes.xml" xpointer="xpointer(/idea-plugin/*)"/>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <sql.dialect dbms="DATAFUSION_BRIKK" implementationClass="dev.sort.datafusionspice.sql.DatafusionSqlDialect" order="first"/>
+        <sql.dialect dbms="SPICE_BRIKK" implementationClass="dev.sort.datafusionspice.sql.SpiceSqlDialect" order="first"/>
+        <lang.parserDefinition language="DataFusionSQL" implementationClass="dev.sort.datafusionspice.sql.DatafusionParserDefinition"/>
+        <lang.parserDefinition language="SpiceSQL" implementationClass="dev.sort.datafusionspice.sql.SpiceParserDefinition"/>
+        <lang.syntaxHighlighterFactory language="DataFusionSQL" implementationClass="dev.sort.datafusionspice.sql.DatafusionSyntaxHighlighterFactory"/>
+        <lang.syntaxHighlighterFactory language="SpiceSQL" implementationClass="dev.sort.datafusionspice.sql.SpiceSyntaxHighlighterFactory"/>
+        <lang.commenter language="DataFusionSQL" implementationClass="com.intellij.database.sql.common.core.psi.impl.support.SqlNestedCommenter"/>
+        <lang.commenter language="SpiceSQL" implementationClass="com.intellij.database.sql.common.core.psi.impl.support.SqlNestedCommenter"/>
+        <completion.contributor language="DataFusionSQL" implementationClass="dev.sort.datafusionspice.sql.DatafusionArguments" id="datafusion.arguments" order="first, before datafusion.filter"/>
+        <completion.contributor language="DataFusionSQL" implementationClass="dev.sort.datafusionspice.sql.DatafusionBuiltinFilter" id="datafusion.filter" order="first, before datafusion.relations"/>
+        <completion.contributor language="DataFusionSQL" implementationClass="dev.sort.datafusionspice.sql.DatafusionRelationCompletion" id="datafusion.relations" order="first, before datafusion.metadata"/>
+        <completion.contributor language="DataFusionSQL" implementationClass="dev.sort.datafusionspice.sql.DatafusionMetadataCompletion" id="datafusion.metadata" order="first"/>
+        <completion.contributor language="SpiceSQL" implementationClass="dev.sort.datafusionspice.sql.SpiceArguments" id="spice.arguments" order="first, before spice.filter"/>
+        <completion.contributor language="SpiceSQL" implementationClass="dev.sort.datafusionspice.sql.SpiceBuiltinFilter" id="spice.filter" order="first, before spice.relations"/>
+        <completion.contributor language="SpiceSQL" implementationClass="dev.sort.datafusionspice.sql.SpiceRelationCompletion" id="spice.relations" order="first, before spice.metadata"/>
+        <completion.contributor language="SpiceSQL" implementationClass="dev.sort.datafusionspice.sql.SpiceMetadataCompletion" id="spice.metadata" order="first"/>
+        <completion.contributor language="DataFusionSQL" implementationClass="dev.sort.datafusionspice.catalog.DatafusionQualifiedPathIntrospection" order="first, before datafusion.arguments"/>
+        <completion.contributor language="SpiceSQL" implementationClass="dev.sort.datafusionspice.catalog.SpiceQualifiedPathIntrospection" order="first, before spice.arguments"/>
+        <annotator language="DataFusionSQL" implementationClass="dev.sort.datafusionspice.catalog.DatafusionReferenceIntrospection"/>
+        <annotator language="SpiceSQL" implementationClass="dev.sort.datafusionspice.catalog.SpiceReferenceIntrospection"/>
+        <daemon.highlightInfoFilter implementation="dev.sort.datafusionspice.catalog.DatafusionOutOfScopeFilter"/>
+        <daemon.highlightInfoFilter implementation="dev.sort.datafusionspice.catalog.SpiceOutOfScopeFilter"/>
+        <lang.documentationProvider language="DataFusionSQL" implementationClass="dev.sort.datafusionspice.sql.DatafusionDocumentation" order="first"/>
+        <lang.documentationProvider language="SpiceSQL" implementationClass="dev.sort.datafusionspice.sql.SpiceDocumentation" order="first"/>
+        <sql.resolveExtension implementation="dev.brikk.house.sql.intellij.dialect.PgFamilyResolveExtension"/>
+        <sql.resolveExtension implementation="dev.sort.datafusionspice.sql.DatafusionRelationResolve"/>
+        <sql.resolveExtension implementation="dev.sort.datafusionspice.sql.SpiceRelationResolve"/>
+        <gotoDeclarationHandler implementation="dev.sort.datafusionspice.sql.DatafusionRelationNavigation"/>
+        <gotoDeclarationHandler implementation="dev.sort.datafusionspice.sql.SpiceRelationNavigation"/>
+        <annotator language="DataFusionSQL" implementationClass="dev.sort.datafusionspice.sql.DatafusionRelationAnnotator"/>
+        <annotator language="DataFusionSQL" implementationClass="dev.sort.datafusionspice.sql.DatafusionFunctionCheck"/>
+        <annotator language="SpiceSQL" implementationClass="dev.sort.datafusionspice.sql.SpiceRelationAnnotator"/>
+        <annotator language="SpiceSQL" implementationClass="dev.sort.datafusionspice.sql.SpiceFunctionCheck"/>
+        <sql.inspectionSuppressorDelegate implementation="dev.sort.datafusionspice.sql.DatafusionRelationSuppressor"/>
+        <sql.inspectionSuppressorDelegate implementation="dev.sort.datafusionspice.sql.SpiceRelationSuppressor"/>
+        <externalAnnotator language="DataFusionSQL" implementationClass="dev.sort.datafusionspice.validation.DatafusionErrorAnnotator"/>
+        <externalAnnotator language="SpiceSQL" implementationClass="dev.sort.datafusionspice.validation.SpiceErrorAnnotator"/>
+        <highlightErrorFilter implementation="dev.sort.datafusionspice.validation.DatafusionErrorFilter"/>
+        <highlightErrorFilter implementation="dev.sort.datafusionspice.validation.SpiceErrorFilter"/>
+        <postStartupActivity implementation="dev.sort.datafusionspice.catalog.DatafusionObserverStartup"/>
+        <postStartupActivity implementation="dev.sort.datafusionspice.catalog.SpiceObserverStartup"/>
+        <notificationGroup id="DataFusion" displayType="BALLOON"/>
+        <notificationGroup id="Spice" displayType="BALLOON"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="com.intellij.database">
+        <dbms id="DATAFUSION_BRIKK" instance="dev.sort.datafusionspice.DatafusionDbms.DATAFUSION_BRIKK"/>
+        <dbms id="SPICE_BRIKK" instance="dev.sort.datafusionspice.SpiceDbms.SPICE_BRIKK"/>
+        <extensionFallback dbms="DATAFUSION_BRIKK" fallbackDbms="POSTGRES"/>
+        <extensionFallback dbms="SPICE_BRIKK" fallbackDbms="POSTGRES"/>
+        <dialect dbms="DATAFUSION_BRIKK" implementationClass="dev.sort.datafusionspice.DatafusionDatabaseDialect"/>
+        <dialect dbms="SPICE_BRIKK" implementationClass="dev.sort.datafusionspice.SpiceDatabaseDialect"/>
+        <modelFacade dbms="DATAFUSION_BRIKK" implementationClass="dev.sort.datafusionspice.DatafusionModelFacade"/>
+        <modelFacade dbms="SPICE_BRIKK" implementationClass="dev.sort.datafusionspice.SpiceModelFacade"/>
+        <introspector dbms="DATAFUSION_BRIKK" implementationClass="dev.sort.datafusionspice.DatafusionIntrospectorGate"/>
+        <introspector dbms="SPICE_BRIKK" implementationClass="dev.sort.datafusionspice.SpiceIntrospectorGate"/>
+        <jdbcSourceLoader dbms="DATAFUSION_BRIKK" implementationClass="com.intellij.database.dialects.generic.introspector.jdbc.GenericJdbcSourceLoader"/>
+        <jdbcSourceLoader dbms="SPICE_BRIKK" implementationClass="com.intellij.database.dialects.generic.introspector.jdbc.GenericJdbcSourceLoader"/>
+        <jdbcHelper dbms="DATAFUSION_BRIKK" implementationClass="com.intellij.database.remote.jdbc.helpers.GenericJdbcHelper"/>
+        <jdbcHelper dbms="SPICE_BRIKK" implementationClass="com.intellij.database.remote.jdbc.helpers.GenericJdbcHelper"/>
+        <errorHandler dbms="DATAFUSION_BRIKK" implementationClass="com.intellij.database.dialects.generic.GenericDatabaseErrorHandler"/>
+        <errorHandler dbms="SPICE_BRIKK" implementationClass="com.intellij.database.dialects.generic.GenericDatabaseErrorHandler"/>
+        <explainPlanProvider dbms="DATAFUSION_BRIKK" implementationClass="dev.sort.datafusionspice.DatafusionExplainPlanProvider"/>
+        <explainPlanProvider dbms="SPICE_BRIKK" implementationClass="dev.sort.datafusionspice.SpiceExplainPlanProvider"/>
+        <connectionInterceptor implementation="dev.sort.datafusionspice.catalog.DatafusionHarvest"/>
+        <connectionInterceptor implementation="dev.sort.datafusionspice.catalog.SpiceHarvest"/>
+        <driversConfig config="config/datafusion-spice-brikk-drivers.xml"/>
+        <artifactsConfig config="config/datafusion-spice-brikk-artifacts.xml"/>
+    </extensions>
+    <applicationListeners>
+        <listener class="dev.sort.datafusionspice.catalog.ProductConnectionListener" topic="com.intellij.database.dataSource.DatabaseConnectionManager$Listener"/>
+        <listener class="dev.sort.datafusionspice.catalog.DatafusionCleanup" topic="com.intellij.database.dataSource.DataSourceStorage$Listener"/>
+        <listener class="dev.sort.datafusionspice.catalog.SpiceCleanup" topic="com.intellij.database.dataSource.DataSourceStorage$Listener"/>
+    </applicationListeners>
+    <projectListeners>
+        <listener class="dev.sort.datafusionspice.catalog.DatafusionCleanup" topic="com.intellij.database.dataSource.DataSourceStorage$Listener"/>
+        <listener class="dev.sort.datafusionspice.catalog.SpiceCleanup" topic="com.intellij.database.dataSource.DataSourceStorage$Listener"/>
+    </projectListeners>
+    <actions>
+        <action id="Datafusion.RefreshCatalog" class="dev.sort.datafusionspice.catalog.DatafusionRefreshCatalogAction" text="Refresh DataFusion Catalog">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
+        <action id="Spice.RefreshCatalog" class="dev.sort.datafusionspice.catalog.SpiceRefreshCatalogAction" text="Refresh Spice Catalog">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>

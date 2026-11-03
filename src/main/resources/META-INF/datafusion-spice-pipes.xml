@@ -1,0 +1,36 @@
+<idea-plugin>
+    <extensions defaultExtensionNs="com.intellij">
+        <dynamicActionConfigurationCustomizer implementation="dev.sort.datafusionspice.pipes.DatafusionSpiceExecuteConfiguration"/>
+        <actionPromoter implementation="dev.sort.datafusionspice.pipes.DatafusionSpiceExecutePromoter" order="first"/>
+        <completion.contributor language="DataFusionSQL" implementationClass="dev.sort.datafusionspice.pipes.DatafusionPipeStageCompletion" id="datafusion.stages" order="first, before datafusion.arguments"/>
+        <completion.contributor language="SpiceSQL" implementationClass="dev.sort.datafusionspice.pipes.SpicePipeStageCompletion" id="spice.stages" order="first, before spice.arguments"/>
+        <annotator language="DataFusionSQL" implementationClass="dev.sort.datafusionspice.pipes.DatafusionPipeStageAnnotator"/>
+        <annotator language="SpiceSQL" implementationClass="dev.sort.datafusionspice.pipes.SpicePipeStageAnnotator"/>
+        <projectConfigurable id="dev.sort.datafusionspice.datafusion.pipes" displayName="DataFusion Brikk PIPE" parentId="database.main" nonDefaultProject="true" instance="dev.sort.datafusionspice.pipes.DatafusionPipesConfigurable"/>
+        <projectConfigurable id="dev.sort.datafusionspice.spice.pipes" displayName="Spice Brikk PIPE" parentId="database.main" nonDefaultProject="true" instance="dev.sort.datafusionspice.pipes.SpicePipesConfigurable"/>
+        <intentionAction>
+            <language>DataFusionSQL</language><className>dev.sort.datafusionspice.pipes.DatafusionPipePreviewIntention</className><category>DataFusion</category>
+        </intentionAction>
+        <intentionAction>
+            <language>DataFusionSQL</language><className>dev.sort.datafusionspice.pipes.DatafusionPipeRunIntention</className><category>DataFusion</category>
+        </intentionAction>
+        <intentionAction>
+            <language>SpiceSQL</language><className>dev.sort.datafusionspice.pipes.SpicePipePreviewIntention</className><category>Spice</category>
+        </intentionAction>
+        <intentionAction>
+            <language>SpiceSQL</language><className>dev.sort.datafusionspice.pipes.SpicePipeRunIntention</className><category>Spice</category>
+        </intentionAction>
+    </extensions>
+    <actions>
+        <group id="DatafusionPipes.EditorMenu" class="com.intellij.ide.actions.NonEmptyActionGroup" text="DataFusion Brikk PIPE" popup="true">
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+            <action id="DatafusionPipes.Preview" class="dev.sort.datafusionspice.pipes.DatafusionPipePreview" text="Preview Generated SQL"/>
+            <action id="DatafusionPipes.RunToStage" class="dev.sort.datafusionspice.pipes.DatafusionPipeRunToStage" text="Run Stages up to Caret"/>
+        </group>
+        <group id="SpicePipes.EditorMenu" class="com.intellij.ide.actions.NonEmptyActionGroup" text="Spice Brikk PIPE" popup="true">
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+            <action id="SpicePipes.Preview" class="dev.sort.datafusionspice.pipes.SpicePipePreview" text="Preview Generated SQL"/>
+            <action id="SpicePipes.RunToStage" class="dev.sort.datafusionspice.pipes.SpicePipeRunToStage" text="Run Stages up to Caret"/>
+        </group>
+    </actions>
+</idea-plugin>

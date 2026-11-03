@@ -1,0 +1,2 @@
+# No internal API exemptions have been approved for this plugin.
+# Do not copy approvals from sibling plugins.

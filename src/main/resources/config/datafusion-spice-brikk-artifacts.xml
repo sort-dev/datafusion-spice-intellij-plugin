@@ -1,0 +1,9 @@
+<artifacts>
+    <!-- The qualified driver is a single shaded JAR, downloaded by Database Tools, not embedded. -->
+    <artifact id="arrow-flight-sql-jdbc-brikk" name="Arrow Flight SQL JDBC (Brikk)">
+        <version version="19.0.0">
+            <item type="jar" url="https://repo.maven.apache.org/maven2/org/apache/arrow/flight-sql-jdbc-driver/19.0.0/flight-sql-jdbc-driver-19.0.0.jar"/>
+            <item type="license" url="https://www.apache.org/licenses/LICENSE-2.0.txt"/>
+        </version>
+    </artifact>
+</artifacts>

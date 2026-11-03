@@ -1,0 +1,23 @@
+package dev.sort.datafusionspice.sql
+
+import com.intellij.sql.dialects.base.SqlSyntaxHighlighterFactory
+import dev.brikk.house.sql.intellij.completion.SqlBuiltinPrototypeFilter
+import dev.brikk.house.sql.intellij.completion.SqlCompletionContributor
+import dev.brikk.house.sql.intellij.completion.DatafusionArgumentCompletion
+import dev.brikk.house.sql.intellij.dialect.DatafusionFunctionAnnotator
+import dev.brikk.house.sql.intellij.docs.DatafusionDocumentationProvider
+import dev.brikk.house.sql.intellij.parser.DatafusionFamilyParserDefinition
+import dev.brikk.house.sql.intellij.relation.*
+
+class DatafusionParserDefinition : DatafusionFamilyParserDefinition(DatafusionSqlDialect)
+class DatafusionSyntaxHighlighterFactory : SqlSyntaxHighlighterFactory.Base(DatafusionSqlDialect)
+class DatafusionArguments : DatafusionArgumentCompletion(DatafusionSqlDialect.editorProfile)
+class DatafusionBuiltinFilter : SqlBuiltinPrototypeFilter(DatafusionSqlDialect.editorProfile)
+class DatafusionRelationCompletion : ExternalRelationCompletionContributor(DatafusionSqlDialect.editorProfile)
+class DatafusionMetadataCompletion : SqlCompletionContributor(DatafusionSqlDialect.editorProfile)
+class DatafusionDocumentation : DatafusionDocumentationProvider(DatafusionSqlDialect.editorProfile)
+class DatafusionRelationResolve : ExternalRelationResolveExtension(DatafusionSqlDialect.editorProfile)
+class DatafusionRelationNavigation : ExternalRelationGotoDeclarationHandler(DatafusionSqlDialect.editorProfile)
+class DatafusionRelationAnnotator : ExternalRelationAnnotator(DatafusionSqlDialect.editorProfile)
+class DatafusionFunctionCheck : DatafusionFunctionAnnotator(DatafusionSqlDialect.editorProfile)
+class DatafusionRelationSuppressor : ExternalRelationInspectionSuppressor(DatafusionSqlDialect.editorProfile)
