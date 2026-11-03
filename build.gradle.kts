@@ -46,12 +46,18 @@ val flightDriverClasspath = configurations.named("testRuntimeClasspath")
 tasks.withType<Test>().configureEach {
     jvmArgumentProviders.add(org.gradle.process.CommandLineArgumentProvider {
         val driver = flightDriverClasspath.get().files.single { it.name == "flight-sql-jdbc-driver-19.0.0.jar" }
-        listOf("-Dtest.flightDriverJar=${driver.absolutePath}")
+        val probeClasspath = layout.buildDirectory.file("cache-probe/$name-classpath.txt").get().asFile
+        probeClasspath.parentFile.mkdirs()
+        probeClasspath.writeText(classpath.asPath)
+        listOf("-Dtest.flightDriverJar=${driver.absolutePath}", "-Dtest.cacheProbeClasspathFile=${probeClasspath.absolutePath}")
     })
     val liveUrl = providers.environmentVariable("BRIKK_FLIGHT_TEST_URL").orNull
     if (liveUrl == null) {
         exclude("**/live/**")
     } else {
+        if (!providers.environmentVariable("BRIKK_FLIGHT_TEST_TLS_ROOT").isPresent) {
+            exclude("**/live/FlightSqlSecurityTest*")
+        }
         systemProperty("flight.test.url", liveUrl)
         systemProperty("flight.test.product", providers.environmentVariable("BRIKK_FLIGHT_TEST_PRODUCT").get())
         systemProperty("flight.test.output", layout.buildDirectory.dir("readiness/live").get().asFile.absolutePath)

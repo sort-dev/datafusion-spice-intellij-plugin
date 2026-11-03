@@ -14,7 +14,7 @@ class DatafusionLiveCatalogService(scope: CoroutineScope) : LiveCatalogService(s
     override val profile = datafusionCatalog
     override fun onRefreshed(project: Project, dataSource: LocalDataSource, outcome: RefreshOutcome, reason: RefreshReason) {
         super.onRefreshed(project, dataSource, outcome, reason)
-        if (outcome is RefreshOutcome.Refreshed) restartProductHighlighting(project)
+        catalogRefreshCompleted(project, dataSource, profile, outcome, reason)
     }
 }
 

@@ -17,23 +17,25 @@ not establish the live editor/connection experience.
   contain additions, not inherited driver values. The user's saved Spice driver
   override had only the old --add-opens value; it must be corrected at driver
   level once. Preserve explicit overrides; do not edit live IDE settings on disk.
-- [ ] Add TLS/authentication-policy and bounded cancellation checks for supported
-  endpoints. Current live fixtures are isolated plaintext loopback; DataFusion's
-  fixture handshake is not a production authorization policy. Do not run dangerous
-  leak/failure probes in the user's IDE or claim unsupported operations work.
+- [ ] Qualify DataFusion TLS/auth, production credential handling and bounded
+  cancellation for supported endpoints. Disposable Spice 2.4.0 / Arrow 19 checks
+  now pass with TLS and API keys, including four rejection paths, but direct JDBC
+  is not a Password Safe or driver-dialog test. DataFusion's fixture handshake is
+  not a production authorization policy. Do not run dangerous leak/failure probes
+  in the user's IDE or claim unsupported operations work.
 - [ ] Cover fresh-process/cross-version cache migration, out-of-band metadata
   changes, stale in-flight refresh and reconnect/disposal in the consumer. Native
   inventory disk round-trip and memory-only session behavior are now tested under
   each IDE runtime, but that is narrower than this full lifecycle gate.
+  This pass adds separate writer/reader JVMs and connection-identity race checks;
+  cross-library-format migration and same-identity concurrent refresh/removal
+  semantics remain separate gates, not implied by those tests.
 - [ ] Expand physical-column rename/find-usages and injected-host coverage.
   Navigation to loaded model columns is now checked in the no-edit introspection
   fixtures. Function docs/links, named-option insertion, local alias rename and
   explicit dollar-string injection have regression tests. The stock PostgreSQL
   single-quoted host fixture retained doubled quote escapes; do not treat that as
   qualified host decoding or add automatic Kotlin recognition as a local fix.
-- [ ] Rerun isolated coexistence against current peer ZIPs when available. The
-  tested immutable set is Doris 1.6.2, DuckDB/Trino 0.4.2 and ClickHouse 0.1.2 from
-  plugin-builds/20261017-main-dogfood. No flattened Brikk classpath was used.
 
 ## Decisions and release gates
 
@@ -49,9 +51,6 @@ not establish the live editor/connection experience.
 - [ ] Qualify namespace-changing operations before enabling UI-generated USE.
   Readback and unset-scope seeding work independently; a zero update count cannot
   prove a server namespace changed.
-- [ ] Address manual-refresh feedback through a reviewed consumer/shared hook.
-  Current profiles have no notificationGroupId, so refresh may be silent even
-  though metadata changes restart analysis. Do not bring back a permanent banner.
 - [ ] Prepare the shared reusable release workflow and final listing assets,
   trademark/licensing review and owner-only upload procedure. Commit/push is now
   authorized; GitHub releases/tags and Marketplace publication are not.
@@ -76,6 +75,12 @@ not establish the live editor/connection experience.
   readback, empty-scope seeding and targeted lazy introspection on open/completion.
 - [x] Connection, refresh and session-inventory invalidation without text edits.
   Explicit user schema selections remain unchanged.
+- [x] Manual Refresh has one-off outcome feedback through the service's existing
+  callback and shared escaped-notification helper. Automatic events stay quiet,
+  raw driver details are not exposed, and no editor banner is registered.
+- [x] Fix the consumer scope race by pinning identity before the native harvest,
+  then checking identity/product ownership before readback and before applying
+  defaults. The new regression reproduced the stale-scope bug before the fix.
 - [x] Separate off-by-default workspace PIPE settings, cooperative execution,
   preview and run-to-stage. Ten qualified lowered stages execute in both pinned
   disposable endpoints; unsupported stages stay refusals.
@@ -83,13 +88,20 @@ not establish the live editor/connection experience.
   55.2.0 execution embedding, namespace query, parameter rebinding and fresh
   connections. JSON-function query passes on Spice; DataFusion session-only view
   isolation and qualified nullable binding pass. No models or paid calls were run.
+- [x] Disposable Spice TLS/API-key fixture with certificate verification enabled.
+  All six server checks pass over TLS; positive auth, missing/invalid key,
+  untrusted root and hostname-mismatch checks also pass on the 261 runtime.
 - [x] Native catalog disk serialization and no persistence of session-only facts.
+  Separate writer/reader JVMs now check current-format reload for both products;
+  this does not close the cross-library migration gate.
 - [x] Intention descriptions and before/after resources for all four PIPE actions,
   with real IntelliJ metadata/resource lookup tests.
 - [x] Function documentation/link, named-argument insertion, alias rename and
   explicit injected SQL parser/Unicode-offset regressions.
 - [x] Isolated private Brikk copies and cooperative Execute chains with four
-  archived peer ZIPs on 261/262/263; four checks per runtime pass.
+  archived peer ZIPs and snapshots of current installed ClickHouse/Doris/DuckDB/
+  Trino payloads on 261/262/263; four checks per runtime pass in each set. Snapshot
+  versions and hashes are recorded in testing.md and the ignored build evidence.
 - [x] Full configured verifier target set, including DataGrip: Compatible, with
   all API notices retained. See the open approval gate above.
 - [x] CI workflow matching peer build/test/artifact conventions; no publication job.

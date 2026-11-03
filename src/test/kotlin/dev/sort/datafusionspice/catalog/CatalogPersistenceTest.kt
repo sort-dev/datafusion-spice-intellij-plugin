@@ -7,8 +7,45 @@ import dev.brikk.house.sql.scope.Nullability
 import dev.sort.datafusionspice.PluginPlatformTestCase
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.concurrent.TimeUnit
 
 class CatalogPersistenceTest : PluginPlatformTestCase() {
+    fun testASeparateReaderJvmLoadsTheWriterCacheWithoutSessionFacts() {
+        val classpath = Files.readString(Path.of(requireNotNull(System.getProperty("test.cacheProbeClasspathFile"))))
+        val java = Path.of(System.getProperty("java.home"), "bin", "java").toString()
+        for (product in listOf("spice", "datafusion")) {
+            val directory = Files.createTempDirectory(Files.createDirectories(Path.of("build", "catalog-process-cache")), "$product-")
+            try {
+                for (mode in listOf("write", "read")) {
+                    // IDE classpaths exceed Linux's single-argument limit. A Java
+                    // argument file keeps both parent and child command lines short.
+                    fun quote(value: String) = "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
+                    val arguments = directory.resolve("$mode.args")
+                    Files.writeString(arguments, listOf("-ea", "-cp", quote(classpath),
+                        "dev.sort.datafusionspice.catalog.CatalogCacheProcessProbe",
+                        mode, quote(directory.toAbsolutePath().toString()), product).joinToString("\n"))
+                    val process = ProcessBuilder(java, "@${arguments.toAbsolutePath()}")
+                        .redirectErrorStream(true).start()
+                    try {
+                        assertTrue("$mode cache process did not finish", process.waitFor(30, TimeUnit.SECONDS))
+                        val output = process.inputStream.bufferedReader().readText()
+                        assertEquals(output, 0, process.exitValue())
+                        assertTrue(output, output.contains(if (mode == "write") "written:$product" else "read:$product"))
+                    } finally {
+                        if (process.isAlive) process.destroyForcibly().waitFor()
+                    }
+                }
+                Files.walk(directory).use { paths ->
+                    paths.filter(Files::isRegularFile).forEach { file ->
+                        assertFalse(Files.readString(file).contains("private_session_function"))
+                        assertFalse(Files.readString(file).contains("private-session-schema"))
+                        assertFalse(Files.readString(file).contains("private-session-version"))
+                    }
+                }
+            } finally { directory.toFile().deleteRecursively() }
+        }
+    }
+
     fun testBothProductInventoriesRoundTripWithTheIdeSerializationRuntime() {
         for ((product, version) in listOf("spice" to "2.4.0", "datafusion" to "55.2.0")) {
             val parent = Files.createDirectories(Path.of("build", "catalog-persistence"))

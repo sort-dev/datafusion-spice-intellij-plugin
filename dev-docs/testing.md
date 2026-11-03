@@ -15,13 +15,25 @@ support/JDBC/test support 0.4.0. Tests use each IDE's bundled runtime.
 ./gradlew test test262 test263 -Ptest.kotlin=present
 ```
 
-The standard suite passes 50 tests per runtime with zero failures/errors/skips,
-300 executions across the two Kotlin modes. The final local pass is recorded in
-`build/readiness/runtime-matrix.log` and `build/readiness/kotlin-present.log`;
-preserved XML is under `build/readiness/matrix-absent/` and `matrix-present/`.
+The standard suite passes 63 tests per runtime with zero failures/errors/skips,
+378 executions across the two Kotlin modes. The latest local pass is recorded in
+`build/lifecycle/runtime-matrix.log` and `build/lifecycle/kotlin-present.log`;
+preserved XML is under `build/lifecycle/matrix-absent/` and `matrix-present/`.
+The final combined rerun is logged in `build/lifecycle/final-validation.log`.
 The configured builds are 261.25134.95, 262.10968.63 and 263.5701.42.
 
 Coverage now includes:
+
+- Actual consumer-hook/shared-harvester lifecycle checks for both products. URL
+  edits during harvesting or namespace readback and a foreign-driver switch must
+  not seed stale scope. Explicit scope, foreign/helper isolation and failed-new-
+  identity fallback are checked. The stale-scope regression failed before the fix.
+- Explicit Refresh notifications through the existing consumer hook, including
+  escaped source names, credential-detail suppression, non-success outcomes and
+  silence for automatic events. See [catalog-lifecycle-followup.md](catalog-lifecycle-followup.md).
+- Separate cache writer/reader JVMs on each IDE runtime. Current-format native
+  inventories survive; memory-only session functions, namespace and version do
+  not. This is not cross-library-version format migration.
 
 - Actual descriptor/service loading, exact product ownership, explicit mappings,
   local parser errors, function kinds, real completion insertion, formatting and
@@ -37,7 +49,8 @@ Coverage now includes:
   `ConsoleRunConfiguration` assembly, not merely XML text.
 - Both products' native inventories serialized and reloaded through a new
   `LiveCatalogStore` under the IDE serialization runtime. Session-only facts must
-  not reappear from disk. This is not fresh-process/cross-version cache migration.
+  not reappear from disk. Separate-process coverage is described above;
+  cross-library-version migration remains unqualified.
 - All four intention description/example directories through IntelliJ metadata
   lookup, including both actions of each family hidden by settings deduplication.
 - Shared PIPE console contracts, native-mode defaults, refusal/staleness checks,
@@ -82,9 +95,38 @@ match upstream release commit `b406a1bd894963f3a09f63f02f6b04e606f083f2`.
 Its fixture binary was built with `cargo build --locked --offline`, outside the
 upstream checkout's output directories.
 
-These are plaintext loopback fixtures. They do not establish TLS, a production
-authorization policy, arbitrary cancellation, or reliable Spice prepared updates /
-NULL bindings. A returned update count is not treated as an execution success.
+The default lane uses plaintext loopback fixtures. It does not establish a
+production authorization policy, arbitrary cancellation or reliable Spice prepared
+updates / NULL bindings. A returned update count is not treated as execution success.
+
+### Disposable TLS and API-key checks
+
+```sh
+python3 tools/run-flight-smoke.py --product spice --spice-secure --java-home /path/to/jdk21
+```
+
+All 11 checks pass on Spice 2.4.0 with Arrow JDBC 19.0.0: the six server checks
+above over TLS, a trusted-certificate/valid-key query, and rejection of missing and
+invalid keys, an untrusted certificate and a mismatched hostname. Certificate
+verification remains enabled. Negative tests check the distinct observed reasons,
+not merely any exception. This lane currently uses the standard 261 runtime.
+
+The runner generates one-day test certificates and a random API key in a private
+temporary fixture directory. Spice reads a read-only mount; instance state lives
+in container tmpfs. Only ephemeral loopback ports are published. Runner-owned
+containers are removed and temporary keys/certificates are deleted in cleanup.
+The key goes to the test JVM through its environment, not a JDBC URL or command
+argument. Saved fixture logs redact it. No IDE credential store is changed.
+
+The test uses Arrow's `tlsRootCerts` property and its non-reserved RPC-header
+properties to send `Authorization: Bearer <fixture-key>` on each call, matching
+[Spice's documented Flight policy](https://spiceai.org/docs/api/auth). This is a
+direct JDBC fixture, not qualification of Password Safe, the driver dialog or
+production authentication. DataFusion TLS/auth and cancellation remain open.
+
+Evidence: `build/lifecycle/secure-runner.log`,
+`build/readiness/spice-secure-live-tests.log`, `spice-secure-live-status.json`,
+`spice-secure-test-results/` and `spice-secure-fixture.log`.
 
 ## Private classloaders and sibling coexistence
 
@@ -95,11 +137,17 @@ copies, ownership of both languages, installed cooperative Execute chains and
 single delegation / detachment of this plugin's customizer. Background errors fail
 the run. Kotlin is absent in this lane; it is tested separately above.
 
-Peer inputs are immutable archived ZIPs from `plugin-builds/20261017-main-dogfood`:
-ClickHouse 0.1.2, Doris 1.6.2, DuckDB 0.4.2, Trino 0.4.2. SQL Transpiler was explicitly
-absent. This is not proof against every current/newer peer ZIP or every possible
-wrapper registration permutation. Reports: `build/readiness/isolation.log` and
-`build/readiness/isolation-results/`.
+The latest inputs are read-only snapshots of the user's installed peer payloads:
+ClickHouse `0.2.2-dev.202611031440+5ebe3a85e48d`, Doris `1.6.4`, DuckDB
+`0.5.1-dev.202611030056+c097fc5d8050.dirty` and Trino
+`0.4.4-dev.202610302129+2486f8f6b75e.dirty`. SQL Transpiler was explicitly absent.
+These are installed-payload snapshots, not rebuilt or newly released peer ZIPs.
+Per-file hashes and ZIP hashes are in
+`build/lifecycle/installed-peers/manifest.json`; capture checked that installed
+files stayed unchanged. All 12 executions pass with zero failures/errors/skips.
+Reports: `build/lifecycle/installed-isolation.log` and `installed-isolation/`.
+The older archived ZIP pass remains under `build/readiness/isolation-results/`.
+Neither pass establishes every possible wrapper registration permutation.
 
 ## Fresh full Plugin Verifier audit
 
@@ -116,8 +164,8 @@ Capturing Project before the EDT handoff removed four unnecessary ProtoConnectio
 references; no allowance or suppression was added.
 
 The audited development label is
-`0.1.0-dev.202611031545+459380e400df.dirty`. Exact input versions and complete
-reports are in `build/readiness/plugin-verifier-final.log` and
+`0.1.0-dev.202611031637+e206c36cbdbc.dirty`. Exact input versions and complete
+reports are in `build/lifecycle/plugin-verifier.log` and
 `build/reports/pluginVerifier/`. A subsequent commit-derived packaging label is
 not by itself a new verifier audit. `api-usage-approvals.txt` remains empty of
 exemptions: **Compatible is not publication approval**.
@@ -138,7 +186,7 @@ verification and ZIP/test-artifact uploads all succeeded. The hosted verifier jo
 is manual-only and was skipped on this push; the five verdicts above are the
 separate local audit, not a hosted verifier result. There is no publication job.
 
-The clean local dogfood built from that commit is
+The previous clean local dogfood built from `f656bae` is
 `datafusion-spice-intellij-plugin-0.1.0-dev.202611031623+f656bae740f6.zip`, SHA-256
 `f8853a50fecec325d3670356be30378f1d001dcae94f4c70ee79ecfcd9379387`.
 All 124 runtime-payload entries match the audited dirty build after normalizing
@@ -147,8 +195,12 @@ record is `build/readiness/clean-payload-equivalence.json`; this is payload
 equivalence, not a newly relabeled Plugin Verifier run. The final clean build also
 passed all 50 tests in an isolated runtime using installed IDE build 262.9437.185.
 
+The lifecycle follow-up also passes all 63 tests in an isolated runtime of that
+installed IDE, using `-Ptest.ide262=/home/jayson/.local/share/JetBrains/Toolbox/apps/intellij-idea`.
+Evidence is `build/lifecycle/installed-runtime.log` and `installed-runtime/`.
+
 The user's live editor symptoms, actual driver dialog/process, clean interactive
-installs, TLS/auth policy, fresh-process cache migration and production endpoint
+installs, production TLS/auth policy, cross-library cache migration and endpoint
 scope remain open in [TODO.md](TODO.md). The installed IDE 262.9437.185 was tested
 earlier in an isolated runtime lane, not controlled as a live UI. Reconnection and
 schema/model behavior still need actual dogfooding. Namespace-changing SQL remains

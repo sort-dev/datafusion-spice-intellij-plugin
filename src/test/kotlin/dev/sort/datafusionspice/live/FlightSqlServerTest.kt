@@ -28,6 +28,10 @@ class FlightSqlServerTest : PluginPlatformTestCase() {
         Class.forName("org.apache.arrow.driver.jdbc.ArrowFlightJdbcDriver")
         DriverManager.setLoginTimeout(10)
         val properties = Properties()
+        System.getenv("BRIKK_FLIGHT_TEST_TLS_ROOT")?.let { properties["tlsRootCerts"] = it }
+        // Arrow forwards non-reserved properties as RPC headers. Spice expects
+        // Bearer authorization on each call; this fixture does not negotiate a token.
+        System.getenv("BRIKK_FLIGHT_TEST_TOKEN")?.let { properties["Authorization"] = "Bearer $it" }
         if (product == "datafusion") {
             properties["user"] = "fixture"
             properties["password"] = "fixture"

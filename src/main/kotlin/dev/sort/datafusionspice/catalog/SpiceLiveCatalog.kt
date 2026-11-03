@@ -14,7 +14,7 @@ class SpiceLiveCatalogService(scope: CoroutineScope) : LiveCatalogService(scope)
     override val profile = spiceCatalog
     override fun onRefreshed(project: Project, dataSource: LocalDataSource, outcome: RefreshOutcome, reason: RefreshReason) {
         super.onRefreshed(project, dataSource, outcome, reason)
-        if (outcome is RefreshOutcome.Refreshed) restartProductHighlighting(project)
+        catalogRefreshCompleted(project, dataSource, profile, outcome, reason)
     }
 }
 

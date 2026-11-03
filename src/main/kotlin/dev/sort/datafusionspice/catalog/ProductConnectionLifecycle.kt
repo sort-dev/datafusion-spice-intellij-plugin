@@ -41,16 +41,21 @@ abstract class ProductHarvest(private val service: Class<out LiveCatalogService>
     override suspend fun handleConnected(connection: DatabaseConnectionCore, proto: DatabaseConnectionInterceptor.ProtoConnection) {
         val profile = ApplicationManager.getApplication().getService(service)?.profile ?: return
         if (!profile.enabled || !profile.dataSources.accepts(connection.dbms)) return
-        super.handleConnected(connection, proto)
         val project = proto.project
         if (project.isDisposed) return
-        if (isHelperRequestor((connection as? DatabaseConnection)?.requestor)) return
         val source = connection.connectionPoint.dataSource
-        if (!source.introspectionScope.isEmpty) return
+        if (!profile.dataSources.accepts(source.dbms)) return
+        // Pin before the shared harvester, not after it: a source edited while
+        // harvesting must not receive namespace facts from the old connection.
         val identity = profile.identity(source)
+        super.handleConnected(connection, proto)
+        if (isHelperRequestor((connection as? DatabaseConnection)?.requestor)) return
+        if (project.isDisposed || !profile.dataSources.accepts(source.dbms) ||
+            profile.identity(source) != identity || !source.introspectionScope.isEmpty) return
         val namespace = productSearchPath.readBack(connection) ?: return
         withContext(Dispatchers.EDT) {
-            if (!project.isDisposed && profile.identity(source) == identity && initializeProductScope(source, namespace)) {
+            if (!project.isDisposed && profile.dataSources.accepts(source.dbms) &&
+                profile.identity(source) == identity && initializeProductScope(source, namespace)) {
                 listOfNotNull(DataSourceStorage.getProjectStorage(project), DataSourceStorage.getStorage())
                     .firstOrNull { source in it.ownDataSources }?.updateDataSource(source)
             }
