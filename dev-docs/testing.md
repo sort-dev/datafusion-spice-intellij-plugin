@@ -112,7 +112,8 @@ All 11 checks pass on Spice 2.4.0 with Arrow JDBC 19.0.0: the six server checks
 above over TLS, a trusted-certificate/valid-key query, and rejection of missing and
 invalid keys, an untrusted certificate and a mismatched hostname. Certificate
 verification remains enabled. Negative tests check the distinct observed reasons,
-not merely any exception. This lane currently uses the standard 261 runtime.
+not merely any exception. The original standalone record uses 261; the remote
+matrix below repeats these checks on all three runtimes.
 
 The runner generates one-day test certificates and a random API key in a private
 temporary fixture directory. Spice reads a read-only mount; instance state lives
@@ -133,22 +134,30 @@ Evidence: `build/lifecycle/secure-runner.log`,
 
 ### IDE remote JDBC process
 
-`--ide-process` adds three checks through an actual IDE-launched Arrow JDBC
+`--ide-process` adds four checks through an actual IDE-launched Arrow JDBC
 process: first-connect native inventory/default scope and inherited VM flags,
 helper refresh that must skip an invalid user startup script, and healthy fresh
-connections after close. `--test-task test262` or `test263` selects another
+connections after close. The fourth opens a real `JdbcConsole`, uses the actual
+registered Execute action for ordinary SQL and opted-in PIPE, confirms PIPE is
+lowered before server submission without replacing the user's document, invokes
+the registered manual Refresh action, and executes a healthy next request.
+Connect/SELECT remain quiet and manual Refresh gives one success notification.
+`--test-task test262` or `test263` selects another
 configured runtime. See [remote-driver-qualification.md](remote-driver-qualification.md).
 
-Both plaintext products pass all nine checks on 261, including the six direct
-JDBC checks. Reports are in `build/readiness/<product>-remote-test-test-results/`
-and `<product>-remote-test-live-tests.log`; runner output is
-`build/nap/remote-flight-runner.log`. The first attempted run reproduced inventory
+Both plaintext products pass all ten checks on 261/262/263, including the six
+direct JDBC checks. Reports are in
+`build/readiness/<product>-remote-<task>-test-results/` and the matching
+`-live-tests.log`; runner output is `build/nap/console-flight-runner.log` and
+`remote-runtime-matrix.log`. The first attempted run reproduced inventory
 loss before the consumer identity fix. This is still not interactive installation
 or production credential-store qualification.
-The secure Spice variant also passes all 14 checks on 261, including three real
-remote-process checks and the five TLS/auth checks. Evidence is in
-`build/readiness/spice-secure-remote-test-test-results/` and
-`build/nap/remote-secure-runner.log`.
+The secure Spice variant passes all 15 checks on each runtime, including four
+real remote-process checks and the five TLS/auth checks. Across both plaintext
+products and secure Spice this is 105 successful executions, with no
+failures/errors/skips. Evidence is in
+`build/readiness/spice-secure-remote-<task>-test-results/`; a final three-runtime
+XML snapshot and machine-readable counts are in `build/nap/remote-xml-snapshot/`.
 
 ## Private classloaders and sibling coexistence
 
@@ -201,6 +210,14 @@ Run `./gradlew dogfoodZip` for the current Git-derived ZIP path and checksum; do
 not pick an older ZIP merely because it is first in a directory listing.
 
 CI follows the peers' checkout/JDK/Gradle/runtime/build/artifact flow.
+[Hosted run 41692113541](https://github.com/sort-dev/datafusion-spice-intellij-plugin/actions/runs/41692113541)
+passed on first-connection identity implementation `7ece225e76cc424c273668e84221f4c21065deb1`,
+including both Kotlin modes on all three runtimes and packaging/artifacts.
+CI now preserves separate mode-specific raw XML and summaries before the next
+mode overwrites Gradle's output. The snapshot helper has six passing Python tests.
+See [test-evidence.md](test-evidence.md).
+
+Earlier lifecycle evidence:
 [Hosted run 41688372935](https://github.com/sort-dev/datafusion-spice-intellij-plugin/actions/runs/41688372935)
 passed on lifecycle implementation commit `5f7b4ea2e509b23b722f374e1797bcd7197b1f25`.
 Both Kotlin modes on 261/262/263, packaging/distribution checks and artifact uploads

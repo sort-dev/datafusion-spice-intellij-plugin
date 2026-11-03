@@ -23,9 +23,19 @@ jobs:
           java-version: 21
       - uses: gradle/actions/setup-gradle@v4
       - name: Test 261, 262 and 263 without Kotlin
+        id: test_absent
         run: ./gradlew test test262 test263 -Ptest.kotlin=absent --max-workers=2
+      - name: Preserve Kotlin-absent XML before the next mode
+        if: always() && steps.test_absent.outcome != 'skipped'
+        run: python3 tools/archive-test-results.py --destination build/ci/kotlin-absent --require-passing
       - name: Test 261, 262 and 263 with Kotlin
+        id: test_present
         run: ./gradlew test test262 test263 -Ptest.kotlin=present --max-workers=2
+      - name: Preserve Kotlin-present XML
+        if: always() && steps.test_present.outcome != 'skipped'
+        run: python3 tools/archive-test-results.py --destination build/ci/kotlin-present --require-passing
+      - name: Check evidence archiving tools
+        run: python3 -m unittest discover -s tools -p 'test_*.py'
       - name: Build and verify distribution
         run: ./gradlew buildPlugin verifyDistribution --max-workers=2
       - name: Upload local-install ZIP
@@ -42,6 +52,7 @@ jobs:
           path: |
             build/reports/tests/
             build/test-results/
+            build/ci/
           if-no-files-found: warn
 
   verify:

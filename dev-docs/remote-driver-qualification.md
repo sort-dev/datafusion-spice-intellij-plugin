@@ -45,9 +45,15 @@ to leave it unchanged. No SQL engine code or vendored library was copied.
 
 ## Boundaries
 
+The next qualification step adds an actual `JdbcConsole`. Its ordinary SELECT,
+opted-in PIPE Execute, registered manual Refresh and healthy subsequent request
+pass on all three runtimes, for both plaintext products and secure Spice. The
+observer correlates the console inventory after its first request. The test checks
+the SQL submitted to the real server and keeps the user's PIPE document unchanged.
+
 These are automated sandbox operations, not interactive installation, the user's
 window or production credential-store qualification. Spice fixture authorization
 is a synthetic advanced driver header. It is not a claim that API keys belong in
-saved plain-text properties. Full console execution, tree/model introspection,
+saved plain-text properties. Broader console UI behavior, tree/model introspection,
 out-of-band changes and arbitrary server cancellation need their own evidence.
 Exact lanes and results are recorded in testing.md.

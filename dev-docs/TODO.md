@@ -90,6 +90,10 @@ not establish the live editor/connection experience.
 - [x] Real IDE-launched Arrow driver process against disposable Spice/DataFusion,
   inherited VM flags, first native harvest/scope, helper startup-script isolation
   and fresh connections after close. This is not an interactive driver-dialog test.
+- [x] Actual JdbcConsole Execute for ordinary SQL and opted-in PIPE, registered
+  manual Refresh, correlated session inventory and a healthy following request.
+  Both plaintext products and secure Spice pass on 261/262/263. Generated SQL is
+  submitted without replacing the user's PIPE document; automatic events stay quiet.
 - [x] Separate off-by-default workspace PIPE settings, cooperative execution,
   preview and run-to-stage. Ten qualified lowered stages execute in both pinned
   disposable endpoints; unsupported stages stay refusals.
@@ -99,7 +103,7 @@ not establish the live editor/connection experience.
   isolation and qualified nullable binding pass. No models or paid calls were run.
 - [x] Disposable Spice TLS/API-key fixture with certificate verification enabled.
   All six server checks pass over TLS; positive auth, missing/invalid key,
-  untrusted root and hostname-mismatch checks also pass on the 261 runtime.
+  untrusted root and hostname-mismatch checks also pass on all three runtimes.
 - [x] Native catalog disk serialization and no persistence of session-only facts.
   Separate writer/reader JVMs now check current-format reload for both products;
   this does not close the cross-library migration gate.
@@ -120,6 +124,8 @@ not establish the live editor/connection experience.
   compatible verifier verdicts above came from the separate local audit.
   Lifecycle implementation 5f7b4ea also passed hosted CI 41688372935 with both
   Kotlin modes, all three runtimes, distribution checks and artifact uploads.
+  First-connect identity implementation 7ece225 passed hosted CI 41692113541.
+  CI now preserves both modes' raw XML and summaries instead of only the last mode.
 - [x] Remove version-blind transport banners/statement warnings. README names the
   observed versions, actual upstream owners and issue links instead.
 
