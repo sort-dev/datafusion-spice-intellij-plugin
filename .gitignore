@@ -1,0 +1,10 @@
+build/
+*/build/
+out/
+.gradle/
+.intellijPlatform/
+.kotlin/
+.idea/
+*.iml
+.DS_Store
+local.properties
