@@ -52,9 +52,6 @@ not establish the live editor/connection experience.
 - [ ] Address manual-refresh feedback through a reviewed consumer/shared hook.
   Current profiles have no notificationGroupId, so refresh may be silent even
   though metadata changes restart analysis. Do not bring back a permanent banner.
-- [ ] Confirm the first hosted CI run after pushing the workflow. Local runtime
-  tests are not a hosted-CI result. The workflow builds/tests only; it publishes
-  nothing and runs the full verifier on manual dispatch.
 - [ ] Prepare the shared reusable release workflow and final listing assets,
   trademark/licensing review and owner-only upload procedure. Commit/push is now
   authorized; GitHub releases/tags and Marketplace publication are not.
@@ -96,6 +93,10 @@ not establish the live editor/connection experience.
 - [x] Full configured verifier target set, including DataGrip: Compatible, with
   all API notices retained. See the open approval gate above.
 - [x] CI workflow matching peer build/test/artifact conventions; no publication job.
+  First hosted run 41673732794 passed on implementation commit f656bae: both
+  Kotlin modes on 261/262/263, build/distribution checks and artifact upload.
+  The hosted verifier job is manual-only and was skipped on that push; the five
+  compatible verifier verdicts above came from the separate local audit.
 - [x] Remove version-blind transport banners/statement warnings. README names the
   observed versions, actual upstream owners and issue links instead.
 

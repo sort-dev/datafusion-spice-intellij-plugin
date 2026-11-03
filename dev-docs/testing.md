@@ -15,7 +15,8 @@ support/JDBC/test support 0.4.0. Tests use each IDE's bundled runtime.
 ./gradlew test test262 test263 -Ptest.kotlin=present
 ```
 
-The standard suite has 50 tests per runtime. The final pass is recorded in
+The standard suite passes 50 tests per runtime with zero failures/errors/skips,
+300 executions across the two Kotlin modes. The final local pass is recorded in
 `build/readiness/runtime-matrix.log` and `build/readiness/kotlin-present.log`;
 preserved XML is under `build/readiness/matrix-absent/` and `matrix-present/`.
 The configured builds are 261.25134.95, 262.10968.63 and 263.5701.42.
@@ -129,9 +130,22 @@ neither Arrow JDBC, test support, Kotlin stdlib nor a serialization runtime copy
 Run `./gradlew dogfoodZip` for the current Git-derived ZIP path and checksum; do
 not pick an older ZIP merely because it is first in a directory listing.
 
-CI follows the peers' checkout/JDK/Gradle/runtime/build/artifact flow. A first
-hosted run must be observed after the workflow is pushed; local tests are not a
-hosted CI verdict. There is no publication job.
+CI follows the peers' checkout/JDK/Gradle/runtime/build/artifact flow.
+[Hosted run 41673732794](https://github.com/sort-dev/datafusion-spice-intellij-plugin/actions/runs/41673732794)
+passed on implementation commit `f656bae740f68e599fd493dfca74fc9f0dec2a49`:
+the three-runtime matrix with Kotlin absent and present, build/distribution
+verification and ZIP/test-artifact uploads all succeeded. The hosted verifier job
+is manual-only and was skipped on this push; the five verdicts above are the
+separate local audit, not a hosted verifier result. There is no publication job.
+
+The clean local dogfood built from that commit is
+`datafusion-spice-intellij-plugin-0.1.0-dev.202611031623+f656bae740f6.zip`, SHA-256
+`f8853a50fecec325d3670356be30378f1d001dcae94f4c70ee79ecfcd9379387`.
+All 124 runtime-payload entries match the audited dirty build after normalizing
+only the exact build-version fields in the descriptor/manifest. The comparison
+record is `build/readiness/clean-payload-equivalence.json`; this is payload
+equivalence, not a newly relabeled Plugin Verifier run. The final clean build also
+passed all 50 tests in an isolated runtime using installed IDE build 262.9437.185.
 
 The user's live editor symptoms, actual driver dialog/process, clean interactive
 installs, TLS/auth policy, fresh-process cache migration and production endpoint
