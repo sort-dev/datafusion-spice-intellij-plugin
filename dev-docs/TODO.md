@@ -109,6 +109,8 @@ not establish the live editor/connection experience.
   Kotlin modes on 261/262/263, build/distribution checks and artifact upload.
   The hosted verifier job is manual-only and was skipped on that push; the five
   compatible verifier verdicts above came from the separate local audit.
+  Lifecycle implementation 5f7b4ea also passed hosted CI 41688372935 with both
+  Kotlin modes, all three runtimes, distribution checks and artifact uploads.
 - [x] Remove version-blind transport banners/statement warnings. README names the
   observed versions, actual upstream owners and issue links instead.
 

@@ -179,6 +179,13 @@ Run `./gradlew dogfoodZip` for the current Git-derived ZIP path and checksum; do
 not pick an older ZIP merely because it is first in a directory listing.
 
 CI follows the peers' checkout/JDK/Gradle/runtime/build/artifact flow.
+[Hosted run 41688372935](https://github.com/sort-dev/datafusion-spice-intellij-plugin/actions/runs/41688372935)
+passed on lifecycle implementation commit `5f7b4ea2e509b23b722f374e1797bcd7197b1f25`.
+Both Kotlin modes on 261/262/263, packaging/distribution checks and artifact uploads
+succeeded. The hosted verifier was skipped because it is manual-only. The five
+compatible verdicts above are the separate local audit.
+
+Earlier baseline evidence:
 [Hosted run 41673732794](https://github.com/sort-dev/datafusion-spice-intellij-plugin/actions/runs/41673732794)
 passed on implementation commit `f656bae740f68e599fd493dfca74fc9f0dec2a49`:
 the three-runtime matrix with Kotlin absent and present, build/distribution
@@ -198,6 +205,15 @@ passed all 50 tests in an isolated runtime using installed IDE build 262.9437.18
 The lifecycle follow-up also passes all 63 tests in an isolated runtime of that
 installed IDE, using `-Ptest.ide262=/home/jayson/.local/share/JetBrains/Toolbox/apps/intellij-idea`.
 Evidence is `build/lifecycle/installed-runtime.log` and `installed-runtime/`.
+
+The clean lifecycle dogfood ZIP from `5f7b4ea` is
+`datafusion-spice-intellij-plugin-0.1.0-dev.202611031752+5f7b4ea2e509.zip`, SHA-256
+`1fa8cddff46c09499f31c103b0b21658d812d7741fc25120c369acaeff8005ee`.
+All 125 normalized runtime-payload entries match the latest audited dirty build.
+Only the main JAR filename and exact descriptor/manifest build-version fields were
+normalized. Evidence: `build/lifecycle/clean-payload-equivalence.json`.
+That clean build also passes 63 tests on installed IDE 262.9437.185 and distribution
+verification, recorded in `build/lifecycle/clean-installed-runtime.log`.
 
 The user's live editor symptoms, actual driver dialog/process, clean interactive
 installs, production TLS/auth policy, cross-library cache migration and endpoint
