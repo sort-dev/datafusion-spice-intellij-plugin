@@ -7,7 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import com.intellij.database.dataSource.LocalDataSource
 import com.intellij.openapi.project.Project
 
-val datafusionCatalog = DatafusionCatalogProfile(DatafusionDbms.DATAFUSION_BRIKK)
+val datafusionCatalog: DatafusionCatalogProfile = ProductCatalogProfile(DatafusionDbms.DATAFUSION_BRIKK, "datafusion")
 
 @Service(Service.Level.APP)
 class DatafusionLiveCatalogService(scope: CoroutineScope) : LiveCatalogService(scope) {

@@ -120,11 +120,13 @@ def datafusion(binary):
                 process.wait()
 
 
-def test(product, port, java_home, secure_fixture=None, token=None):
+def test(product, port, java_home, secure_fixture=None, token=None, ide_process=False, test_task="test"):
     env = os.environ.copy()
     env.update(JAVA_HOME=str(java_home), BRIKK_FLIGHT_TEST_PRODUCT=product,
                BRIKK_FLIGHT_TEST_URL=f"jdbc:arrow-flight-sql://127.0.0.1:{port}/?useEncryption=false")
     label = f"{product}-secure" if secure_fixture else product
+    if ide_process:
+        label += f"-remote-{test_task}"
     if secure_fixture:
         env.update(BRIKK_FLIGHT_TEST_URL=f"jdbc:arrow-flight-sql://127.0.0.1:{port}/?useEncryption=true",
                    BRIKK_FLIGHT_TEST_TLS_ROOT=str(secure_fixture / "server.crt"),
@@ -139,8 +141,9 @@ def test(product, port, java_home, secure_fixture=None, token=None):
     success = False
     try:
         with (OUTPUT / f"{label}-live-tests.log").open("w") as log:
-            run(str(ROOT / "gradlew"), "test", "--tests", "dev.sort.datafusionspice.live.FlightSqlServerTest",
+            run(str(ROOT / "gradlew"), test_task, "--tests", "dev.sort.datafusionspice.live.FlightSqlServerTest",
                 *(["--tests", "dev.sort.datafusionspice.live.FlightSqlSecurityTest"] if secure_fixture else []),
+                *(["--tests", "dev.sort.datafusionspice.live.RemoteFlightProcessTest"] if ide_process else []),
                 "--no-daemon", "--max-workers=2", "--console=plain", cwd=ROOT, env=env,
                 stdout=log, stderr=subprocess.STDOUT, timeout=300)
         success = True
@@ -148,7 +151,7 @@ def test(product, port, java_home, secure_fixture=None, token=None):
         status.write_text(json.dumps({"product": product, "status": "passed" if success else "failed", "started": started}))
         destination = OUTPUT / f"{label}-test-results"
         destination.mkdir(exist_ok=True)
-        for report in (ROOT / "build/test-results/test").glob("TEST-*FlightSql*Test.xml"):
+        for report in (ROOT / "build/test-results" / test_task).glob("TEST-*Flight*Test.xml"):
             if report.stat().st_mtime >= started:
                 shutil.copyfile(report, destination / report.name)
 
@@ -157,6 +160,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--product", choices=["spice", "datafusion", "both"], default="both")
     parser.add_argument("--spice-secure", action="store_true", help="Use disposable TLS certificates and API-key authentication for Spice")
+    parser.add_argument("--ide-process", action="store_true", help="Also launch the IDE's real remote JDBC process")
+    parser.add_argument("--test-task", choices=["test", "test262", "test263"], default="test")
     parser.add_argument("--java-home", type=Path, required=True)
     parser.add_argument("--datafusion-binary", type=Path,
                         default=ROOT / "build/datafusion-reference/debug/brikk-datafusion-flight-execution")
@@ -164,7 +169,7 @@ if __name__ == "__main__":
     OUTPUT.mkdir(parents=True, exist_ok=True)
     if args.product in ("spice", "both"):
         with spice(args.spice_secure) as (port, fixture, token):
-            test("spice", port, args.java_home, fixture if args.spice_secure else None, token)
+            test("spice", port, args.java_home, fixture if args.spice_secure else None, token, args.ide_process, args.test_task)
     if args.product in ("datafusion", "both"):
         with datafusion(args.datafusion_binary) as port:
-            test("datafusion", port, args.java_home)
+            test("datafusion", port, args.java_home, ide_process=args.ide_process, test_task=args.test_task)

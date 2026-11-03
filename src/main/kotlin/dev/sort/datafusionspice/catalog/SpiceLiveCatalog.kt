@@ -7,7 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import com.intellij.database.dataSource.LocalDataSource
 import com.intellij.openapi.project.Project
 
-val spiceCatalog = SpiceCatalogProfile(SpiceDbms.SPICE_BRIKK)
+val spiceCatalog: DatafusionCatalogProfile = ProductCatalogProfile(SpiceDbms.SPICE_BRIKK, "spice")
 
 @Service(Service.Level.APP)
 class SpiceLiveCatalogService(scope: CoroutineScope) : LiveCatalogService(scope) {

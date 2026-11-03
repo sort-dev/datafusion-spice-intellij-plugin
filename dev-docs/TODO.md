@@ -10,6 +10,8 @@ not establish the live editor/connection experience.
   default namespace selection and typing-triggered introspection in a live IDE.
   The missing hooks are implemented and recording-model tests cover no-edit sync;
   that is not a claim to have driven the user's window.
+  Real remote-process tests also exposed and fixed first-connect version learning
+  invalidating the catalog identity. See remote-driver-qualification.md.
 - [ ] Exercise clean interactive ZIP installs on 261/262/263, including actual
   driver-process launch, secure credential handling, URL controls, both dialects,
   settings, preview/run UI and disposal/unload behavior.
@@ -81,6 +83,13 @@ not establish the live editor/connection experience.
 - [x] Fix the consumer scope race by pinning identity before the native harvest,
   then checking identity/product ownership before readback and before applying
   defaults. The new regression reproduced the stale-scope bug before the fix.
+- [x] Separate user connection settings from automatically observed server version
+  in consumer catalog identity. A first IDE remote connection and first helper
+  refresh now retain their inventory; actual user/driver/property edits still
+  invalidate it. No shared SQL machinery or vendored library was changed.
+- [x] Real IDE-launched Arrow driver process against disposable Spice/DataFusion,
+  inherited VM flags, first native harvest/scope, helper startup-script isolation
+  and fresh connections after close. This is not an interactive driver-dialog test.
 - [x] Separate off-by-default workspace PIPE settings, cooperative execution,
   preview and run-to-stage. Ten qualified lowered stages execute in both pinned
   disposable endpoints; unsupported stages stay refusals.

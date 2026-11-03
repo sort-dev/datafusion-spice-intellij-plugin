@@ -15,11 +15,11 @@ support/JDBC/test support 0.4.0. Tests use each IDE's bundled runtime.
 ./gradlew test test262 test263 -Ptest.kotlin=present
 ```
 
-The standard suite passes 63 tests per runtime with zero failures/errors/skips,
-378 executions across the two Kotlin modes. The latest local pass is recorded in
-`build/lifecycle/runtime-matrix.log` and `build/lifecycle/kotlin-present.log`;
-preserved XML is under `build/lifecycle/matrix-absent/` and `matrix-present/`.
-The final combined rerun is logged in `build/lifecycle/final-validation.log`.
+The standard suite passes 67 tests per runtime with zero failures/errors/skips,
+402 executions across the two Kotlin modes. The latest local pass is recorded in
+`build/nap/identity-matrix.log` and `build/nap/identity-present.log`;
+preserved XML is under `build/nap/identity-matrix/` and `identity-present/`.
+The earlier 63-test lifecycle evidence remains under `build/lifecycle/`.
 The configured builds are 261.25134.95, 262.10968.63 and 263.5701.42.
 
 Coverage now includes:
@@ -58,6 +58,9 @@ Coverage now includes:
 
 The suite captures background logged errors. Live server and isolated-loader
 classes are excluded from this normal matrix and run separately below.
+
+The first-connection identity fix adds four standard identity checks. Both Kotlin
+modes pass on all three runtimes; earlier evidence is preserved, not relabeled.
 
 ## Real disposable Flight SQL fixtures
 
@@ -128,6 +131,25 @@ Evidence: `build/lifecycle/secure-runner.log`,
 `build/readiness/spice-secure-live-tests.log`, `spice-secure-live-status.json`,
 `spice-secure-test-results/` and `spice-secure-fixture.log`.
 
+### IDE remote JDBC process
+
+`--ide-process` adds three checks through an actual IDE-launched Arrow JDBC
+process: first-connect native inventory/default scope and inherited VM flags,
+helper refresh that must skip an invalid user startup script, and healthy fresh
+connections after close. `--test-task test262` or `test263` selects another
+configured runtime. See [remote-driver-qualification.md](remote-driver-qualification.md).
+
+Both plaintext products pass all nine checks on 261, including the six direct
+JDBC checks. Reports are in `build/readiness/<product>-remote-test-test-results/`
+and `<product>-remote-test-live-tests.log`; runner output is
+`build/nap/remote-flight-runner.log`. The first attempted run reproduced inventory
+loss before the consumer identity fix. This is still not interactive installation
+or production credential-store qualification.
+The secure Spice variant also passes all 14 checks on 261, including three real
+remote-process checks and the five TLS/auth checks. Evidence is in
+`build/readiness/spice-secure-remote-test-test-results/` and
+`build/nap/remote-secure-runner.log`.
+
 ## Private classloaders and sibling coexistence
 
 Four isolated tests pass per runtime on 261/262/263, 12 executions. The shared
@@ -164,8 +186,8 @@ Capturing Project before the EDT handoff removed four unnecessary ProtoConnectio
 references; no allowance or suppression was added.
 
 The audited development label is
-`0.1.0-dev.202611031637+e206c36cbdbc.dirty`. Exact input versions and complete
-reports are in `build/lifecycle/plugin-verifier.log` and
+`0.1.0-dev.202611031759+b02c3dbbe823.dirty`, including the first-connection identity
+fix. Exact input versions and complete reports are in `build/nap/identity-verifier.log` and
 `build/reports/pluginVerifier/`. A subsequent commit-derived packaging label is
 not by itself a new verifier audit. `api-usage-approvals.txt` remains empty of
 exemptions: **Compatible is not publication approval**.
