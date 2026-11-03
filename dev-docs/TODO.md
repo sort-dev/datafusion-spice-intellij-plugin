@@ -35,6 +35,9 @@ not establish the live editor/connection experience.
   This pass adds separate writer/reader JVMs and connection-identity race checks;
   cross-library-format migration and same-identity concurrent refresh/removal
   semantics remain separate gates, not implied by those tests.
+  Out-of-band inventory changes now have real-console manual-refresh checks on
+  all three runtimes. Native cache/editor-facts revisions change without an edit;
+  arbitrary server-side changes and reconnect/disposal ordering remain broader gates.
 - [ ] Qualify database-DDL rename UI and broaden quoted physical-column/host
   coverage. Indexed physical-column find usages and reference-only rename now
   keep same-named schema columns and string literals separate. Both explicitly
@@ -103,6 +106,11 @@ not establish the live editor/connection experience.
   manual Refresh, correlated session inventory and a healthy following request.
   Both plaintext products and secure Spice pass on 261/262/263. Generated SQL is
   submitted without replacing the user's PIPE document; automatic events stay quiet.
+- [x] Out-of-band Spice pod reload and DataFusion session-registry changes become
+  visible to real-console manual Refresh without changing document text. The
+  mutation is proved by reading actual rows, not an update count. Both plaintext
+  products and secure Spice pass on all three runtimes. DataFusion's synthetic
+  remote password uses Database Tools' memory credentials API, not the URL.
 - [x] Separate off-by-default workspace PIPE settings, cooperative execution,
   preview and run-to-stage. Ten qualified lowered stages execute in both pinned
   disposable endpoints; unsupported stages stay refusals.
@@ -138,6 +146,9 @@ not establish the live editor/connection experience.
   Kotlin modes, all three runtimes, distribution checks and artifact uploads.
   First-connect identity implementation 7ece225 passed hosted CI 41692113541.
   CI now preserves both modes' raw XML and summaries instead of only the last mode.
+  Console/evidence checkpoint 3410a54 passed CI 41693793919; its downloaded artifact
+  contains both modes' raw XML. Editor/cancellation checkpoint 599c27a passed CI
+  41696634679 with 72 tests per runtime in each mode.
 - [x] Remove version-blind transport banners/statement warnings. README names the
   observed versions, actual upstream owners and issue links instead.
 

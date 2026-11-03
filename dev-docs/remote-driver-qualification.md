@@ -54,6 +54,8 @@ the SQL submitted to the real server and keeps the user's PIPE document unchange
 These are automated sandbox operations, not interactive installation, the user's
 window or production credential-store qualification. Spice fixture authorization
 is a synthetic advanced driver header. It is not a claim that API keys belong in
-saved plain-text properties. Broader console UI behavior, tree/model introspection,
-out-of-band changes and arbitrary server cancellation need their own evidence.
+saved plain-text properties. Broader console UI behavior, tree/model introspection
+and arbitrary server cancellation need their own evidence. The subsequent
+[out-of-band refresh checks](out-of-band-refresh.md) cover a pod reload and a
+same-session registry mutation, not every possible external change.
 Exact lanes and results are recorded in testing.md.

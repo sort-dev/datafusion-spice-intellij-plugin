@@ -56,7 +56,8 @@ def spice_fixture(fixture, secure):
         "--env", "SPICE_CONFIG_DIR=/run/spice",
         "--publish", "127.0.0.1::50051", "--publish", "127.0.0.1::8090",
         "--mount", f"type=bind,src={fixture},dst=/app,readonly", "--workdir", "/app",
-        "spiceai/spiceai:2.4.0", "--http", "0.0.0.0:8090", "--flight", "0.0.0.0:50051", "--cpu-cores", "2", *tls_args)
+        "spiceai/spiceai:2.4.0", "--http", "0.0.0.0:8090", "--flight", "0.0.0.0:50051", "--cpu-cores", "2",
+        "--pods-watcher-enabled", *tls_args)
     try:
         info = json.loads(run("docker", "inspect", name, capture_output=True).stdout)[0]
         ports = info["NetworkSettings"]["Ports"]
@@ -120,10 +121,14 @@ def datafusion(binary):
                 process.wait()
 
 
-def test(product, port, java_home, secure_fixture=None, token=None, ide_process=False, test_task="test"):
+def test(product, port, java_home, secure_fixture=None, token=None, ide_process=False, test_task="test", spicepod=None):
     env = os.environ.copy()
     env.update(JAVA_HOME=str(java_home), BRIKK_FLIGHT_TEST_PRODUCT=product,
                BRIKK_FLIGHT_TEST_URL=f"jdbc:arrow-flight-sql://127.0.0.1:{port}/?useEncryption=false")
+    if spicepod:
+        env["BRIKK_FLIGHT_TEST_SPICEPOD"] = str(spicepod)
+    else:
+        env.pop("BRIKK_FLIGHT_TEST_SPICEPOD", None)
     label = f"{product}-secure" if secure_fixture else product
     if ide_process:
         label += f"-remote-{test_task}"
@@ -169,7 +174,8 @@ if __name__ == "__main__":
     OUTPUT.mkdir(parents=True, exist_ok=True)
     if args.product in ("spice", "both"):
         with spice(args.spice_secure) as (port, fixture, token):
-            test("spice", port, args.java_home, fixture if args.spice_secure else None, token, args.ide_process, args.test_task)
+            test("spice", port, args.java_home, fixture if args.spice_secure else None, token, args.ide_process, args.test_task,
+                 fixture / "spicepod.yaml")
     if args.product in ("datafusion", "both"):
         with datafusion(args.datafusion_binary) as port:
             test("datafusion", port, args.java_home, ide_process=args.ide_process, test_task=args.test_task)

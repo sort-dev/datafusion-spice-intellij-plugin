@@ -1,6 +1,8 @@
 package dev.sort.datafusionspice.live
 
 import com.intellij.database.dataSource.*
+import com.intellij.database.access.DatabaseCredentials
+import com.intellij.credentialStore.OneTimeString
 import com.intellij.database.dataSource.connection.ConnectionRequestor
 import com.intellij.database.console.JdbcConsole
 import com.intellij.database.console.session.DatabaseSessionManager
@@ -28,6 +30,8 @@ import com.intellij.testFramework.TestActionEvent
 import com.intellij.util.concurrency.AppExecutorUtil
 import com.intellij.util.ui.classpath.SimpleClasspathElementFactory
 import dev.brikk.house.sql.intellij.catalog.*
+import dev.brikk.house.sql.intellij.relation.RelationFactsResult
+import dev.brikk.house.sql.intellij.recoverEditorOperation
 import dev.sort.datafusionspice.PluginPlatformTestCase
 import dev.sort.datafusionspice.catalog.DatafusionLiveCatalogService
 import dev.sort.datafusionspice.catalog.SpiceLiveCatalogService
@@ -67,13 +71,18 @@ class RemoteFlightProcessTest : PluginPlatformTestCase() {
         source = LocalDataSource().apply {
             name = "disposable $product remote process"
             databaseDriver = driver
-            this.url = if (product == "datafusion") "$url&user=fixture&password=fixture" else url
+            this.url = url
+            if (product == "datafusion") {
+                username = "fixture"
+                passwordStorage = LocalDataSource.Storage.MEMORY
+            }
             isAutoSynchronize = false
             isKeepAlive = false
             workingDir = Files.createDirectories(Path.of("build", "remote-flight-working-dir")).toAbsolutePath().toString()
             System.getenv("BRIKK_FLIGHT_TEST_TLS_ROOT")?.let { driverProperties["tlsRootCerts"] = it }
             System.getenv("BRIKK_FLIGHT_TEST_TOKEN")?.let { driverProperties["Authorization"] = "Bearer $it" }
         }
+        if (product == "datafusion") DatabaseCredentials.getInstance().setPassword(source, OneTimeString("fixture"))
         LocalDataSourceManager.getInstance(project).addDataSource(source)
         catalog = ApplicationManager.getApplication().getService(if (product == "spice")
             SpiceLiveCatalogService::class.java else DatafusionLiveCatalogService::class.java)
@@ -124,6 +133,7 @@ class RemoteFlightProcessTest : PluginPlatformTestCase() {
                 assertTrue(connection.configuration.VM_PARAMETERS.contains("--add-opens=java.base/java.nio=ALL-UNNAMED"))
                 assertTrue(connection.configuration.VM_PARAMETERS.contains("--sun-misc-unsafe-memory-access=allow"))
                 assertEquals("Ada", scalar(connection, "SELECT name FROM sample WHERE id = 1"))
+                assertFalse("Synthetic credentials must not be added to the saved URL", source.url.orEmpty().contains("password="))
                 assertFalse(source.databaseVersion.version.isEmpty())
                 assertEquals("Learning server metadata is not a settings edit", before, catalog.profile.identity(source))
                 val inventory = requireNotNull(catalog.selection(source).inventory)
@@ -150,7 +160,11 @@ class RemoteFlightProcessTest : PluginPlatformTestCase() {
         repeat(2) { background { connection { assertEquals("1", scalar(it, "SELECT 1")) } } }
     }
 
-    fun testRealConsoleExecutePipeAndManualRefresh() {
+    fun testRealConsoleExecutePipeAndManualRefresh() = realConsole(changeInventory = false)
+
+    fun testManualRefreshSeesInventoryChangesOutsideObservedExecution() = realConsole(changeInventory = true)
+
+    private fun realConsole(changeInventory: Boolean) {
         val language = if (product == "spice") SpiceSqlDialect else DatafusionSqlDialect
         if (product == "spice") project.service<SpiceExecutionObserver>().start()
         else project.service<DatafusionExecutionObserver>().start()
@@ -178,6 +192,7 @@ class RemoteFlightProcessTest : PluginPlatformTestCase() {
         })
         val settings = if (product == "spice") project.service<SpicePipesSettings>() else project.service<DatafusionPipesSettings>()
         val enabled = settings.enabled
+        var changedPod: Pair<Path, String>? = null
         fun event() = TestActionEvent.createTestEvent(SimpleDataContext.builder()
             .add(CommonDataKeys.PROJECT, project).add(CommonDataKeys.PSI_FILE, myFixture.file)
             .add(CommonDataKeys.EDITOR, myFixture.editor).add(CommonDataKeys.VIRTUAL_FILE, file.virtualFile)
@@ -206,20 +221,75 @@ class RemoteFlightProcessTest : PluginPlatformTestCase() {
             assertTrue(statements.toString(), statements.size >= 2)
             assertTrue("PIPE syntax reached the server unchanged: $statements", statements.none { "|>" in it })
             assertTrue("The user's SQL must not be replaced by generated SQL", myFixture.file.text.startsWith("FROM sample |>"))
+            val before = requireNotNull(catalog.selection(source, session).inventory)
+            val nativeFacts = language.editorProfile.providers.last()
+            val beforeFacts = nativeFacts.facts(myFixture.file) as RelationFactsResult.Available
+            val changedRelation = "out_of_band_${UUID.randomUUID().toString().replace("-", "")}".takeIf { changeInventory }
+            if (changedRelation != null) {
+                assertFalse(requireNotNull(before.nativeCatalog).relations.any { it.path.last() == changedRelation })
+                if (product == "spice") {
+                    val pod = Path.of(requireNotNull(System.getenv("BRIKK_FLIGHT_TEST_SPICEPOD"))).toRealPath()
+                    val allowed = Path.of(System.getProperty("flight.test.output")).parent.toRealPath()
+                    require(pod.startsWith(allowed) && pod.fileName.toString() == "spicepod.yaml")
+                    val original = Files.readString(pod)
+                    require(original.contains("name: datafusion-spice-readiness\n") && original.contains("\nviews:\n"))
+                    changedPod = pod to original
+                    Files.writeString(pod, original.replace("\nviews:\n", "\nviews:\n  - name: $changedRelation\n    sql: \"SELECT 43 AS n\"\n"))
+                }
+                val request = object : DataRequest.RawRequest(session) {
+                    override fun processRaw(context: DataRequest.Context, connection: DatabaseConnectionCore) {
+                        if (product == "datafusion") {
+                            // A host/embedding can change its connection's inventory outside
+                            // observed SQL execution. Do not report this RawRequest as DDL.
+                            val statement = connection.remoteConnection.createStatement()
+                            try { statement.execute("CREATE VIEW $changedRelation AS SELECT 43 AS n") }
+                            finally { statement.close() }
+                        }
+                        // Prove the change really happened, not merely an update count.
+                        // Spice's runner-owned pod watcher may need a few moments to reload.
+                        val deadline = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(25)
+                        while (true) {
+                            val value = recoverEditorOperation { connection.queryRows("SELECT n FROM $changedRelation", 1, 2).single()["n"] }.getOrNull()
+                            if (value == "43") break
+                            check(System.nanoTime() < deadline) { "Disposable inventory mutation was not observed by its own connection" }
+                            Thread.sleep(100)
+                        }
+                    }
+                }
+                session.messageBus.dataProducer.processRequest(request)
+                PlatformTestUtil.waitWithEventsDispatching("fixture-only inventory mutation is visible", { request in finished && session.isIdle }, 35)
+                assertEmpty(failures)
+                assertSame("Out-of-band changes must not masquerade as an observed statement refresh", before, catalog.selection(source, session).inventory)
+                assertEquals(beforeFacts.revision, (nativeFacts.facts(myFixture.file) as RelationFactsResult.Available).revision)
+            }
+            val stamp = myFixture.editor.document.modificationStamp
             val refresh = if (product == "spice") "Spice.RefreshCatalog" else "Datafusion.RefreshCatalog"
             requireNotNull(ActionManager.getInstance().getAction(refresh)).actionPerformed(event())
             PlatformTestUtil.waitWithEventsDispatching("manual console Refresh reports its outcome", { notifications.isNotEmpty() }, 45)
             assertEquals(NotificationType.INFORMATION, notifications.single().type)
             assertTrue(notifications.single().content, notifications.single().content.contains("refreshed"))
             assertNotNull(catalog.selection(source, session).inventory)
+            assertEquals("Refreshing metadata must not edit the document", stamp, myFixture.editor.document.modificationStamp)
+            if (changedRelation != null) {
+                val after = requireNotNull(catalog.selection(source, session).inventory)
+                assertNotSame(before, after)
+                assertTrue(requireNotNull(after.nativeCatalog).relations.any { it.path == listOf(product, "public", changedRelation) })
+                val facts = nativeFacts.facts(myFixture.file) as RelationFactsResult.Available
+                assertTrue(facts.revision > beforeFacts.revision)
+                assertTrue(facts.facts.tables.keys.toString(), facts.facts.tables.containsKey(quotedCatalogPath(listOf(product, "public", changedRelation))))
+                execute("SELECT n FROM $changedRelation")
+            }
             execute("SELECT 42 AS after_refresh")
             assertEquals(1, notifications.size)
         } finally {
-            settings.enabled = enabled
-            notifications.forEach(Notification::expire)
-            DatabaseSessionViewService.getInstance().destroyView(console)
-            Disposer.dispose(console)
-            Disposer.dispose(session)
+            try { changedPod?.let { (pod, original) -> Files.writeString(pod, original) } }
+            finally {
+                settings.enabled = enabled
+                notifications.forEach(Notification::expire)
+                DatabaseSessionViewService.getInstance().destroyView(console)
+                Disposer.dispose(console)
+                Disposer.dispose(session)
+            }
         }
     }
 }

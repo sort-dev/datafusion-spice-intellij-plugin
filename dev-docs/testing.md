@@ -148,7 +148,7 @@ Evidence: `build/lifecycle/secure-runner.log`,
 
 ### IDE remote JDBC process
 
-`--ide-process` adds four checks through an actual IDE-launched Arrow JDBC
+`--ide-process` adds five checks through an actual IDE-launched Arrow JDBC
 process: first-connect native inventory/default scope and inherited VM flags,
 helper refresh that must skip an invalid user startup script, and healthy fresh
 connections after close. The fourth opens a real `JdbcConsole`, uses the actual
@@ -156,22 +156,30 @@ registered Execute action for ordinary SQL and opted-in PIPE, confirms PIPE is
 lowered before server submission without replacing the user's document, invokes
 the registered manual Refresh action, and executes a healthy next request.
 Connect/SELECT remain quiet and manual Refresh gives one success notification.
+The fifth changes inventory outside observed editor execution, proves the new
+view is queryable while the metadata cache stays old, then requires manual Refresh
+to update native inventory/editor-facts revision without editing the document.
+Spice uses a runner-owned pod reload; DataFusion uses the same session's raw
+connection. See [out-of-band-refresh.md](out-of-band-refresh.md).
 `--test-task test262` or `test263` selects another
 configured runtime. See [remote-driver-qualification.md](remote-driver-qualification.md).
 
-Both plaintext products pass all ten checks on 261/262/263, including the six
+Both plaintext products pass all eleven checks on 261/262/263, including the six
 direct JDBC checks. Reports are in
 `build/readiness/<product>-remote-<task>-test-results/` and the matching
-`-live-tests.log`; runner output is `build/nap/console-flight-runner.log` and
-`remote-runtime-matrix.log`. The first attempted run reproduced inventory
+`-live-tests.log`; the final runner matrix is
+`build/nap/out-of-band-runtime-matrix.log`. The first attempted run reproduced inventory
 loss before the consumer identity fix. This is still not interactive installation
 or production credential-store qualification.
-The secure Spice variant passes all 15 checks on each runtime, including four
+The secure Spice variant passes all 16 checks on each runtime, including five
 real remote-process checks and the five TLS/auth checks. Across both plaintext
-products and secure Spice this is 105 successful executions, with no
+products and secure Spice this is 114 successful executions, with no
 failures/errors/skips. Evidence is in
 `build/readiness/spice-secure-remote-<task>-test-results/`; a final three-runtime
-XML snapshot and machine-readable counts are in `build/nap/remote-xml-snapshot/`.
+XML snapshot and machine-readable counts are in `build/nap/out-of-band-xml-snapshot/`.
+The DataFusion remote source supplies its synthetic password through Database
+Tools' in-memory credentials API rather than adding it to the saved URL. Persistent
+Password Safe/OS-keychain and production authorization remain unqualified.
 
 ## Private classloaders and sibling coexistence
 
@@ -224,6 +232,11 @@ Run `./gradlew dogfoodZip` for the current Git-derived ZIP path and checksum; do
 not pick an older ZIP merely because it is first in a directory listing.
 
 CI follows the peers' checkout/JDK/Gradle/runtime/build/artifact flow.
+[Hosted run 41696634679](https://github.com/sort-dev/datafusion-spice-intellij-plugin/actions/runs/41696634679)
+passed on editor/cancellation checkpoint `599c27a`, including the 72-test suite in
+both Kotlin modes on all three runtimes and distribution/artifact checks.
+
+Earlier console evidence:
 [Hosted run 41693793919](https://github.com/sort-dev/datafusion-spice-intellij-plugin/actions/runs/41693793919)
 passed on console/evidence checkpoint `3410a54b15e7d67669d823c136f45e0ca3c9cf2b`.
 Its downloaded artifact contains both Kotlin modes' 67-test three-runtime XML and
