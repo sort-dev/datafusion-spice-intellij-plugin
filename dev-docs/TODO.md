@@ -1,100 +1,107 @@
-# Deferred work and qualification
+# Readiness backlog
 
-This is the developer backlog, not a list of supported features. Keep evidence and
-new findings here as local implementation proceeds. The approved project plan
-remains the full implementation/release checklist.
+This is not a finished-plugin checklist with everything ticked. Automated evidence
+is in [testing.md](testing.md). A working build and compatible verifier verdict do
+not establish the live editor/connection experience.
 
-- [ ] Qualify real Flight SQL sessions against pinned Spice 2.4.0 and a named
-  DataFusion 55.2.0 embedding. Cover TLS/auth, catalogs, reconnect, parameters,
-  actual utility state changes, cancellation and known upstream failures. Do not
-  use the user's connections or run failure/leak probes in their IDE.
-- [ ] Install the packaged ZIP interactively in clean 261/262/263 IDEs. Verify
-  driver launch flags, secure credential handling, URL controls, user overrides,
-  settings and both dialect selections. Headless platform tests are not this gate.
-- [ ] Run isolated-classloader coexistence tests with the four sibling ZIPs and
-  the remaining default Plugin Verifier targets, including DataGrip. The selected
-  IU 262/263 audit is compatible, not an API exemption or publication approval.
-- [ ] Review the concrete shared-library API findings: 1 internal factory
-  reference in GenericJdbcIntrospectorGate, 8 experimental connection-hook usages
-  in HarvestConnectionInterceptor and 1 deprecated model-helper override on each
-  audited IDE. Obtain this plugin's own approval where required; do not transfer
-  peer exemptions or edit the library/vendored conventions to hide findings.
-- [ ] Decide whether a full native-catalog Database Tools tree is needed.
-  Generic JDBC cannot populate the bounded DataFusion fixture's missing metadata
-  RPCs. Keep this limitation visible; no local model-writer substitute.
-- [ ] Qualify namespace switching before enabling UI-generated USE or inherited
-  PostgreSQL session commands. A zero update count does not prove a switch.
-  Read-only namespace readback and default introspection-scope seeding are now
-  implemented; they do not certify execution of namespace-changing statements.
-- [ ] Retest the reported cold/open query red highlight, empty schema selector,
-  initial default scope and typing-triggered introspection in the user's IDE.
-  Missing shared lifecycle/introspection hooks are now wired, with recording-model
-  regression tests. Do not equate those checks with having driven the live UI.
-- [ ] Optional Brikk Kotlin and SQL Transpiler host integration remains separate
-  scope. No Kotlin helper, automatic host recognition or broad language claims.
-- [ ] Check cache persistence and serialization across all IDE runtimes with
-  released dependencies. Report library gaps upstream rather than bundling a
-  second Kotlin/serialization runtime.
-- [ ] Expand consumer-specific editor coverage for injected SQL, documentation
-  links, navigation/rename, named-argument insertion and live/cached inventory
-  changes. Registered upstream adapters are not proof of every packaged behavior.
-- [ ] Add/check intention description resources. The user's IDE log reports
-  missing `description.html` for `DatafusionPipePreviewIntention`; check all four
-  preview/run intentions. Descriptor instantiation tests did not catch this UI
-  resource lookup. Keep this separate from catalog/namespace resolution fixes.
-- [ ] Complete real connection launch checks. The downloaded-driver URL/checksum
-  tests and driver XML/template/VM-option loading tests do not certify a running
-  IDE driver process. A standalone Java 25 JDBC read against the disposable Spice
-  container now passes with the XML's exact options; TLS/auth and the actual IDE
-  connection launch still need qualification.
-  Both required VM flags now belong to both driver defaults, not user setup.
-  Include upgrade behavior for existing customized driver VM options in the
-  interactive check; preserve explicit user overrides.
-  **Diagnosed user report:** on installed IDE 262.9437.185, the new-connection
-  field displays connection-only additions, while launch configuration combines
-  driver and connection options. The installed JAR matches the latest dogfood and
-  contains both flags. The user's saved Spice driver override contains only the
-  older `--add-opens` flag. Update that driver-level override through the IDE once;
-  do not silently edit live settings or copy defaults into every connection.
-- [ ] Prepare CI and release workflow, listing assets, trademark review and exact
-  legal/API evidence before publication. No push or publication is authorized by
-  the local-base task.
-- [ ] Request shared tooling adoption for this sixth plugin. Existing staging
-  and peer isolation lists are hardcoded; never edit vendored conventions locally.
+## Core gates still open
 
-## Known shared-library findings to recheck
+- [ ] Confirm the reported cold/open-query red references, schema dropdown,
+  default namespace selection and typing-triggered introspection in a live IDE.
+  The missing hooks are implemented and recording-model tests cover no-edit sync;
+  that is not a claim to have driven the user's window.
+- [ ] Exercise clean interactive ZIP installs on 261/262/263, including actual
+  driver-process launch, secure credential handling, URL controls, both dialects,
+  settings, preview/run UI and disposal/unload behavior.
+- [ ] Verify driver-settings upgrade behavior interactively. Connection VM fields
+  contain additions, not inherited driver values. The user's saved Spice driver
+  override had only the old --add-opens value; it must be corrected at driver
+  level once. Preserve explicit overrides; do not edit live IDE settings on disk.
+- [ ] Add TLS/authentication-policy and bounded cancellation checks for supported
+  endpoints. Current live fixtures are isolated plaintext loopback; DataFusion's
+  fixture handshake is not a production authorization policy. Do not run dangerous
+  leak/failure probes in the user's IDE or claim unsupported operations work.
+- [ ] Cover fresh-process/cross-version cache migration, out-of-band metadata
+  changes, stale in-flight refresh and reconnect/disposal in the consumer. Native
+  inventory disk round-trip and memory-only session behavior are now tested under
+  each IDE runtime, but that is narrower than this full lifecycle gate.
+- [ ] Expand physical-column rename/find-usages and injected-host coverage.
+  Navigation to loaded model columns is now checked in the no-edit introspection
+  fixtures. Function docs/links, named-option insertion, local alias rename and
+  explicit dollar-string injection have regression tests. The stock PostgreSQL
+  single-quoted host fixture retained doubled quote escapes; do not treat that as
+  qualified host decoding or add automatic Kotlin recognition as a local fix.
+- [ ] Rerun isolated coexistence against current peer ZIPs when available. The
+  tested immutable set is Doris 1.6.2, DuckDB/Trino 0.4.2 and ClickHouse 0.1.2 from
+  plugin-builds/20261017-main-dogfood. No flattened Brikk classpath was used.
 
-- Native catalogs feed editor facts, not a Database Tools model writer.
-- Catalog profiles currently have no refresh-result notification group; manual
-  refresh may be silent. Do not substitute a new profile just to add balloons.
-- Stock parameter prompting does not expose a qualified post-prompt NULL guard.
-  No transport-warning UI is implemented. Upstream issues are version-scoped
-  README notes, not plugin-owned SQL errors or unconditional upgrade warnings.
+## Decisions and release gates
 
-## Completed local baseline
+- [ ] Review the current API audit before publication: 1 internal factory
+  reference, 11 experimental usages and 1 deprecated model-helper override per
+  audited IDE. Three experimental references are in ProductHarvest; capturing the
+  Project before the EDT handoff removed four unnecessary ProtoConnection usages.
+  No exemptions have been granted or copied from peers. Compatible is not approval.
+- [ ] Define the advertised DataFusion endpoint/tree contract. The bounded test
+  embedding has native information-schema inventories but lacks JDBC table-metadata
+  RPCs. Do not promise a full database tree from those facts or invent a local
+  native-model writer; a broader tree requirement needs a reviewed shared design.
+- [ ] Qualify namespace-changing operations before enabling UI-generated USE.
+  Readback and unset-scope seeding work independently; a zero update count cannot
+  prove a server namespace changed.
+- [ ] Address manual-refresh feedback through a reviewed consumer/shared hook.
+  Current profiles have no notificationGroupId, so refresh may be silent even
+  though metadata changes restart analysis. Do not bring back a permanent banner.
+- [ ] Confirm the first hosted CI run after pushing the workflow. Local runtime
+  tests are not a hosted-CI result. The workflow builds/tests only; it publishes
+  nothing and runs the full verifier on manual dispatch.
+- [ ] Prepare the shared reusable release workflow and final listing assets,
+  trademark/licensing review and owner-only upload procedure. Commit/push is now
+  authorized; GitHub releases/tags and Marketplace publication are not.
+- [ ] Request sixth-plugin adoption in shared staging and reverse peer-isolation
+  lists. Do not modify the vendored conventions to hide hardcoded shared lists.
 
-- [x] Single-module build with unmodified shared conventions, released Central
-  dependencies, legal resources, original icons and local Git dev versioning.
-- [x] Both production dialect/DBMS registrations, independent catalog lifecycles,
-  explicit file mappings, local diagnostics and product driver definitions.
-- [x] Separate workspace PIPE settings and cooperative preview/execution adapters.
-- [x] Headless 261/262/263 tests, exact distribution checks and a checksummed local
-  dogfood ZIP. These are not live-transport or interactive-install qualification.
-- [x] Downloaded Arrow 19.0.0 URL handling and qualified binary SHA-256 test.
-- [x] Kotlin-present and Kotlin-absent runtime matrix: 35 tests per mode per IDE,
-  210 total executions. This is coexistence, not custom Kotlin-host integration.
-- [x] Plugin Verifier 1.411 on IU-262.10968.63 and IU-263.5701.42: compatible,
-  with all API notices retained and tracked above.
-- [x] Both required VM flags are automatic defaults for both drivers. Updated
-  36-test suites pass on 261/262/263, including JVM option acceptance, and a real
-  Java 25 Arrow JDBC read against the local Spice sample passes.
-- [x] Remove the version-blind, truncated Spice transport banner and statement
-  warnings. Keep version-specific upstream attribution/issue links in the README;
-  a newer user-installed driver must not inherit assumed bug diagnostics.
-- [x] Diagnose the blank VM-options field using installed IDE bytecode and
-  selected saved-driver fields. README now explains driver-level inheritance and
-  existing overrides, instead of treating a blank connection field as failure.
-- [x] Wire per-product shared lazy introspection, read-only namespace readback,
-  unset-scope seeding, IDE model facts and highlight invalidation. All 43 tests
-  pass on the three pinned runtimes and the user's installed 262.9437.185 test
-  runtime. Actual live-window symptom confirmation remains open above.
+## Optional, not silently part of v1
+
+- [ ] Automatic Brikk Kotlin-host and SQL Transpiler .bsql integration. No Kotlin
+  helper or custom host recognition is currently shipped. Ordinary explicit SQL
+  injection is a separate, narrower feature.
+
+## Implemented and automatically checked
+
+- [x] Checkpoint and push the complete baseline, source, legal files and developer
+  backlog to main. Initial safety checkpoint: 459380e.
+- [x] Both exact dialect/DBMS identities, explicit file mapping, parsing,
+  highlighting, local diagnostics and product-specific Arrow driver definitions.
+- [x] Both required VM flags in both driver defaults; real launch-configuration
+  assembly retains them even with a blank connection-level VM-options field.
+- [x] Shared native catalog lifecycles, stable resolvers, IDE-model facts, namespace
+  readback, empty-scope seeding and targeted lazy introspection on open/completion.
+- [x] Connection, refresh and session-inventory invalidation without text edits.
+  Explicit user schema selections remain unchanged.
+- [x] Separate off-by-default workspace PIPE settings, cooperative execution,
+  preview and run-to-stage. Ten qualified lowered stages execute in both pinned
+  disposable endpoints; unsupported stages stay refusals.
+- [x] Actual shared harvesters over JDBC for Spice 2.4.0 and the pinned DataFusion
+  55.2.0 execution embedding, namespace query, parameter rebinding and fresh
+  connections. JSON-function query passes on Spice; DataFusion session-only view
+  isolation and qualified nullable binding pass. No models or paid calls were run.
+- [x] Native catalog disk serialization and no persistence of session-only facts.
+- [x] Intention descriptions and before/after resources for all four PIPE actions,
+  with real IntelliJ metadata/resource lookup tests.
+- [x] Function documentation/link, named-argument insertion, alias rename and
+  explicit injected SQL parser/Unicode-offset regressions.
+- [x] Isolated private Brikk copies and cooperative Execute chains with four
+  archived peer ZIPs on 261/262/263; four checks per runtime pass.
+- [x] Full configured verifier target set, including DataGrip: Compatible, with
+  all API notices retained. See the open approval gate above.
+- [x] CI workflow matching peer build/test/artifact conventions; no publication job.
+- [x] Remove version-blind transport banners/statement warnings. README names the
+  observed versions, actual upstream owners and issue links instead.
+
+## Intentional boundaries
+
+Background native verification is unavailable: do not execute EXPLAIN or prepare
+user SQL to validate the editor. Upstream Spice/Arrow transport defects are not
+plugin-owned SQL errors. A newer installed driver/server must not inherit assumed
+bug warnings. Do not map GenericSQL/PostgreSQL/all Flight URLs to either product.

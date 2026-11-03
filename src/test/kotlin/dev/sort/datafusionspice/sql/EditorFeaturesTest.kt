@@ -2,10 +2,21 @@ package dev.sort.datafusionspice.sql
 
 import com.intellij.codeInsight.CodeInsightSettings
 import com.intellij.lang.LanguageParserDefinitions
+import com.intellij.lang.LanguageDocumentation
+import com.intellij.lang.injection.InjectedLanguageManager
+import com.intellij.lang.injection.MultiHostInjector
+import com.intellij.lang.injection.MultiHostRegistrar
+import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.util.Disposer
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiErrorElement
+import com.intellij.psi.PsiElement
+import com.intellij.sql.psi.SqlAsExpression
+import com.intellij.sql.psi.SqlStringLiteralExpression
+import com.intellij.refactoring.rename.RenameProcessor
+import com.intellij.codeInsight.lookup.Lookup
+import com.intellij.codeInsight.lookup.LookupElementPresentation
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.testFramework.LightVirtualFile
@@ -105,5 +116,60 @@ class EditorFeaturesTest : PluginPlatformTestCase() {
             assertTrue(myFixture.file.text.endsWith("SELECT 2 AS n"))
             assertEmpty(PsiTreeUtil.findChildrenOfType(myFixture.file, PsiErrorElement::class.java))
         }
+    }
+
+    fun testNamedArgumentCompletionKeepsTheExistingValueAndOneArrow() {
+        open("SELECT * FROM vector_search(docs,'q', lim<caret> => 5)", SpiceSqlDialect)
+        val item = myFixture.completeBasic().orEmpty().single {
+            it.lookupString == "limit" && LookupElementPresentation.renderElement(it).typeText == "vector_search argument"
+        }
+        myFixture.lookup.currentItem = item
+        myFixture.finishLookup(Lookup.NORMAL_SELECT_CHAR)
+        assertEquals("SELECT * FROM vector_search(docs,'q', limit => 5)", myFixture.editor.document.text)
+    }
+
+    fun testRegisteredDocumentationKeepsProductEvidenceAndLinks() {
+        open("SELECT ai_decide(body, '{}', model => 'local') FROM docs", SpiceSqlDialect)
+        val docs = LanguageDocumentation.INSTANCE.allForLanguage(SpiceSqlDialect).filterIsInstance<SpiceDocumentation>().single()
+        val offset = myFixture.file.text.indexOf("ai_decide")
+        val target = requireNotNull(docs.getCustomDocumentationElement(myFixture.editor, myFixture.file, myFixture.file.findElementAt(offset), offset))
+        val html = requireNotNull(docs.generateDoc(target, null))
+        assertTrue(html, html.contains("2.4.0"))
+        assertTrue(html, html.contains("model configuration"))
+        assertEquals(listOf("https://spiceai.org/docs/reference/sql/ai"), docs.getUrlFor(target, null))
+    }
+
+    fun testLocalAliasRenameDoesNotChangeMatchingStringLiterals() {
+        for (dialect in dialects) {
+            open("WITH q AS (SELECT 1 AS item) SELECT item, 'item' FROM q", dialect)
+            val alias = PsiTreeUtil.findChildrenOfType(myFixture.file, SqlAsExpression::class.java).first { it.name == "item" }
+            RenameProcessor(project, alias, "renamed", false, false).run()
+            assertTrue(myFixture.file.text, myFixture.file.text.contains("AS renamed", true))
+            assertTrue(myFixture.file.text, myFixture.file.text.contains("SELECT renamed", true))
+            assertTrue(myFixture.file.text.contains("'item'"))
+        }
+    }
+
+    fun testExplicitInjectedSpiceSqlInDollarStringKeepsUnicodeAndParserIdentity() {
+        val text = "SELECT ${'$'}${'$'}SELECT '😀' AS label, json_get_int('{\"a\":7}', 'a') AS age${'$'}${'$'}"
+        myFixture.configureFromExistingVirtualFile(LightVirtualFile("host.sql", com.intellij.sql.dialects.postgres.PgDialect.INSTANCE, text))
+        val literal = requireNotNull(PsiTreeUtil.findChildOfType(myFixture.file, SqlStringLiteralExpression::class.java))
+        val manager = InjectedLanguageManager.getInstance(project)
+        manager.registerMultiHostInjector(object : MultiHostInjector {
+            override fun getLanguagesToInject(registrar: MultiHostRegistrar, context: PsiElement) {
+                if (context !== literal) return
+                registrar.startInjecting(SpiceSqlDialect)
+                    .addPlace(null, null, literal, TextRange(2, literal.textLength - 2)).doneInjecting()
+            }
+            override fun elementsToInjectIn() = listOf(SqlStringLiteralExpression::class.java)
+        }, testRootDisposable)
+        val injected = requireNotNull(manager.getInjectedPsiFiles(literal)).single().first.containingFile
+        assertSame(SpiceSqlDialect, injected.language)
+        assertTrue(injected.text, injected.text.contains("json_get_int('{\"a\":7}', 'a')"))
+        assertTrue(injected.text.contains("'😀'"))
+        assertEmpty(PsiTreeUtil.findChildrenOfType(injected, PsiErrorElement::class.java))
+        val offset = injected.text.indexOf("json_get_int")
+        val range = manager.injectedToHost(injected, TextRange(offset, offset + "json_get_int".length))
+        assertEquals("json_get_int", text.substring(range.startOffset, range.endOffset))
     }
 }

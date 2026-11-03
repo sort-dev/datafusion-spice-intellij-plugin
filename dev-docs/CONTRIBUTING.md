@@ -32,6 +32,24 @@ records into `dev-docs/archive/` only when they actually become obsolete.
 GitHub pushes, releases, Marketplace uploads and internal-API approvals require
 separate owner authorization. A local successful build is not publication approval.
 
+## Optional disposable Flight checks
+
+`tools/run-flight-smoke.py` starts and cleans up its own Spice 2.4.0 container and
+bounded DataFusion execution fixture. It does not connect to saved IDE sources or
+the user's dogfood container. Docker must be available. Build the shared library's
+qualified test embedding into this repo's ignored output directory first:
+
+```sh
+cargo build --locked --manifest-path /path/to/brikk-sql/tools/datafusion-reference/flight/Cargo.toml \
+  --bin brikk-datafusion-flight-execution --target-dir "$PWD/build/datafusion-reference" -j 2
+python3 tools/run-flight-smoke.py --java-home "$JAVA_HOME"
+```
+
+Use JDK 21 for the Gradle process. The actual tests use the IDE's bundled runtime
+and the driver JVM flags. Run `--product spice` or `--product datafusion` to select
+one fixture. Results/status are under `build/readiness/`. These loopback checks
+are not production TLS/authentication or interactive IDE qualification.
+
 For execution issues, record the installed driver/server versions and actual error
 before assigning ownership. Known upstream bugs belong in version-scoped README
 notes with issue links, not unconditional editor banners or plugin SQL warnings.

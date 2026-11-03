@@ -1,0 +1,6 @@
+version: v1
+kind: Spicepod
+name: datafusion-spice-readiness
+views:
+  - name: sample
+    sql: "SELECT 1 AS id, 'Ada' AS name, 30 AS age UNION ALL SELECT 2, 'Bob', 40"

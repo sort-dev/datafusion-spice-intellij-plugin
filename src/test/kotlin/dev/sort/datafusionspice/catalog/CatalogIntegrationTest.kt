@@ -121,7 +121,7 @@ class CatalogIntegrationTest : PluginPlatformTestCase() {
             sources += source
             DbPsiFacade.getInstance(project).clearCaches()
             val table = if (completion) "$catalog.public." else if (qualified) "$catalog.public.sample" else "sample"
-            val file = myFixture.configureByText("catalog.sql", "SELECT * FROM $table")
+            val file = myFixture.configureByText("catalog.sql", "SELECT ${if (completion) "*" else "id"} FROM $table")
             setSqlDialectMapping(project, file.virtualFile, language, testRootDisposable)
             myFixture.editor.caretModel.moveToOffset(myFixture.editor.document.textLength)
             IndexingTestUtil.waitUntilIndexesAreReady(project)
@@ -144,7 +144,11 @@ class CatalogIntegrationTest : PluginPlatformTestCase() {
                 }
                 val refresh = held.next()
                 assertEquals(catalog, refresh.context.tasks.single().databaseName)
-                refresh.finish { schema.tables.createOrGet("sample") }
+                refresh.finish {
+                    val loaded = schema.tables.createOrGet("sample")
+                    loaded.columns.createOrGet("id")
+                    loaded.columns.createOrGet("name")
+                }
                 PlatformTestUtil.waitWithEventsDispatching("namespace introspection finishes without an edit", {
                     !DataSourceSyncManager.getInstance().isActive(source) && requests.pending(file.virtualFile) == null
                 }, 10)
@@ -157,6 +161,15 @@ class CatalogIntegrationTest : PluginPlatformTestCase() {
                 assertTrue(schema.tables.any { it.name == "sample" })
                 val unresolved = myFixture.doHighlighting().filter { it.description?.contains("resolve", true) == true }
                 assertEmpty(unresolved)
+                if (!completion) {
+                    val offset = myFixture.file.text.indexOf("id")
+                    val navigation = if (catalog == "spice") dev.sort.datafusionspice.sql.SpiceRelationNavigation()
+                        else dev.sort.datafusionspice.sql.DatafusionRelationNavigation()
+                    val targets = navigation.getGotoDeclarationTargets(myFixture.file.findElementAt(offset), offset, myFixture.editor).orEmpty()
+                    assertTrue(targets.toList().toString(), targets.any {
+                        ((it as? com.intellij.database.psi.DbElement)?.delegate as? com.intellij.database.model.DasObject)?.name == "id"
+                    })
+                }
             }
             LocalDataSourceManager.getInstance(project).removeDataSource(source)
             sources.remove(source)

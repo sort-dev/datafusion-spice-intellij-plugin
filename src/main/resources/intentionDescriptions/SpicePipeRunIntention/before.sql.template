@@ -1,0 +1,1 @@
+FROM sample |> SELECT id |> LIMIT 1

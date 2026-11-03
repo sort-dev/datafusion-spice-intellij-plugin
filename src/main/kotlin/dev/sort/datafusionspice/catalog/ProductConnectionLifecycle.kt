@@ -42,15 +42,16 @@ abstract class ProductHarvest(private val service: Class<out LiveCatalogService>
         val profile = ApplicationManager.getApplication().getService(service)?.profile ?: return
         if (!profile.enabled || !profile.dataSources.accepts(connection.dbms)) return
         super.handleConnected(connection, proto)
-        if (proto.project.isDisposed) return
+        val project = proto.project
+        if (project.isDisposed) return
         if (isHelperRequestor((connection as? DatabaseConnection)?.requestor)) return
         val source = connection.connectionPoint.dataSource
         if (!source.introspectionScope.isEmpty) return
         val identity = profile.identity(source)
         val namespace = productSearchPath.readBack(connection) ?: return
         withContext(Dispatchers.EDT) {
-            if (!proto.project.isDisposed && profile.identity(source) == identity && initializeProductScope(source, namespace)) {
-                listOfNotNull(DataSourceStorage.getProjectStorage(proto.project), DataSourceStorage.getStorage())
+            if (!project.isDisposed && profile.identity(source) == identity && initializeProductScope(source, namespace)) {
+                listOfNotNull(DataSourceStorage.getProjectStorage(project), DataSourceStorage.getStorage())
                     .firstOrNull { source in it.ownDataSources }?.updateDataSource(source)
             }
         }

@@ -48,4 +48,13 @@ tasks.withType<Test>().configureEach {
         val driver = flightDriverClasspath.get().files.single { it.name == "flight-sql-jdbc-driver-19.0.0.jar" }
         listOf("-Dtest.flightDriverJar=${driver.absolutePath}")
     })
+    val liveUrl = providers.environmentVariable("BRIKK_FLIGHT_TEST_URL").orNull
+    if (liveUrl == null) {
+        exclude("**/live/**")
+    } else {
+        systemProperty("flight.test.url", liveUrl)
+        systemProperty("flight.test.product", providers.environmentVariable("BRIKK_FLIGHT_TEST_PRODUCT").get())
+        systemProperty("flight.test.output", layout.buildDirectory.dir("readiness/live").get().asFile.absolutePath)
+        jvmArgs("--add-opens=java.base/java.nio=ALL-UNNAMED", "--sun-misc-unsafe-memory-access=allow")
+    }
 }

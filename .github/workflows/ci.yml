@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Test and build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Test 261, 262 and 263 without Kotlin
+        run: ./gradlew test test262 test263 -Ptest.kotlin=absent --max-workers=2
+      - name: Test 261, 262 and 263 with Kotlin
+        run: ./gradlew test test262 test263 -Ptest.kotlin=present --max-workers=2
+      - name: Build and verify distribution
+        run: ./gradlew buildPlugin verifyDistribution --max-workers=2
+      - name: Upload local-install ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-zip
+          path: build/distributions/*.zip
+          if-no-files-found: error
+      - name: Preserve test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            build/reports/tests/
+            build/test-results/
+          if-no-files-found: warn
+
+  verify:
+    name: Plugin Verifier
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew verifyPlugin --max-workers=2
+      - name: Preserve complete verifier reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-verifier-reports
+          path: build/reports/pluginVerifier/
+          if-no-files-found: warn

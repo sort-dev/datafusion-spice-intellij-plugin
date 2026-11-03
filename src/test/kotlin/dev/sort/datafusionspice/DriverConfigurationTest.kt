@@ -1,6 +1,8 @@
 package dev.sort.datafusionspice
 
 import com.intellij.database.dataSource.DatabaseDriverManager
+import com.intellij.database.dataSource.LocalDataSource
+import com.intellij.database.run.ConsoleRunConfiguration
 import com.intellij.database.dataSource.url.template.JdbcTemplateParser
 import org.w3c.dom.Element
 import javax.xml.parsers.DocumentBuilderFactory
@@ -8,6 +10,23 @@ import java.nio.file.Path
 import java.util.concurrent.TimeUnit
 
 class DriverConfigurationTest : PluginPlatformTestCase() {
+    fun testBlankConnectionOptionsInheritBothDriverOptionsInTheRealLaunchConfiguration() {
+        val manager = DatabaseDriverManager.getInstance()
+        for (id in listOf("datafusion-brikk-flight", "spice-brikk-flight")) {
+            val driver = requireNotNull(manager.getDriver(id))
+            val source = LocalDataSource.fromDriver(driver, "jdbc:offline:vm-inheritance", true)
+            assertNull(source.vmOptions)
+            val configuration = ConsoleRunConfiguration.newConfiguration(project)
+            configuration.setOptionsFromDataSource(source)
+            assertTrue(configuration.VM_PARAMETERS, configuration.VM_PARAMETERS.contains("--add-opens=java.base/java.nio=ALL-UNNAMED"))
+            assertTrue(configuration.VM_PARAMETERS, configuration.VM_PARAMETERS.contains("--sun-misc-unsafe-memory-access=allow"))
+            source.vmOptions = "-Ddatafusion.spice.test.option=true"
+            configuration.setOptionsFromDataSource(source)
+            assertTrue(configuration.VM_PARAMETERS.contains("--sun-misc-unsafe-memory-access=allow"))
+            assertTrue(configuration.VM_PARAMETERS.contains("-Ddatafusion.spice.test.option=true"))
+        }
+    }
+
     fun testBothLoadedDriversKeepProductIdentitiesAndPinnedArtifact() {
         val manager = DatabaseDriverManager.getInstance()
         for ((id, dbms, language) in listOf(

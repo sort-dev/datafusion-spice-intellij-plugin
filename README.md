@@ -69,6 +69,18 @@ does not display an editor banner or mark SQL as faulty because of these issues,
 and it does not determine whether a user-installed driver/server contains a fix.
 Database Tools reports actual execution results and driver/server errors.
 
+## A small Spice query
+
+This uses JSON functions without requiring a model or an external dataset:
+
+```sql
+SELECT
+    json_get_str('{"name":"Ada","age":30}', 'name') AS name,
+    json_get_int('{"name":"Ada","age":30}', 'age') AS age;
+```
+
+Expected result: `Ada | 30`.
+
 Bundled metadata covers DataFusion 55.2.0 and Spice 2.4.0. Other versions receive
 labeled fallback metadata, not an exact-version support claim. Live inventories
 keep the two products and their versions separate. Database-tree coverage depends

@@ -8,3 +8,7 @@ out/
 *.iml
 .DS_Store
 local.properties
+
+# Manual Python fixture runner
+__pycache__/
+*.pyc
