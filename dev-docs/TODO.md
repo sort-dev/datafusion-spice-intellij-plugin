@@ -19,26 +19,17 @@ not establish the live editor/connection experience.
   contain additions, not inherited driver values. The user's saved Spice driver
   override had only the old --add-opens value; it must be corrected at driver
   level once. Preserve explicit overrides; do not edit live IDE settings on disk.
-- [ ] Qualify DataFusion TLS/auth, production credential handling and bounded
-  cancellation for supported endpoints. Disposable Spice 2.4.0 / Arrow 19 checks
-  now pass with TLS and API keys, including four rejection paths, but direct JDBC
-  is not a Password Safe or driver-dialog test. DataFusion's fixture handshake is
-  not a production authorization policy. Do not run dangerous leak/failure probes
-  in the user's IDE or claim unsupported operations work.
-  Consumer caller-cancellation now closes a held synthetic metadata statement
-  without seeding scope. That does not bound real server cancellation, namespace
-  probes or RPC cleanup when a driver ignores cancel.
-- [ ] Qualify cross-library cache-format migration, same-identity concurrent
-  refresh/removal, arbitrary out-of-band metadata changes and reconnect/disposal
-  ordering in the consumer. Native
-  inventory disk round-trip and memory-only session behavior are now tested under
-  each IDE runtime, but that is narrower than this full lifecycle gate.
-  This pass adds separate writer/reader JVMs and connection-identity race checks;
-  cross-library-format migration and same-identity concurrent refresh/removal
-  semantics remain separate gates, not implied by those tests.
-  Out-of-band inventory changes now have real-console manual-refresh checks on
-  all three runtimes. Native cache/editor-facts revisions change without an edit;
-  arbitrary server-side changes and reconnect/disposal ordering remain broader gates.
+- [ ] Qualify pending metadata/prepare RPC cancellation and noncooperative cleanup
+  separately from active-stream cancellation. Active streamed-row cancel and
+  same-connection recovery have a bounded disposable-process lane. A driver that
+  ignores cancel or blocks inside cancel/close is not covered by that result.
+- [ ] Consume a reviewed released Brikk fix for two confirmed 0.4.0 lifecycle
+  failures: an in-flight harvest can recreate forgotten metadata, and an older
+  same-identity helper can overwrite a newer completed refresh. Desired-contract
+  reproducers fail on real helpers for both products. Do not hide them with a
+  second consumer cache/generation manager or a locally patched library. Broader
+  reconnect/disposal ordering remains a related qualification gate. See
+  engineering-qualification.md for commands and ownership.
 - [ ] Qualify database-DDL rename UI and broaden quoted physical-column/host
   coverage. Indexed physical-column find usages and reference-only rename now
   keep same-named schema columns and string literals separate. Both explicitly
@@ -49,11 +40,6 @@ not establish the live editor/connection experience.
 
 ## Decisions and release gates
 
-- [ ] Obtain a reviewed DataGrip consumer-test lane in shared conventions. The
-  DataGrip 262 attempt fails before tests because the convention always requests
-  the unavailable bundled Java host plugin. Do not edit vendored build logic or
-  transplant IDEA's Java plugin to disguise this gap. Verifier compatibility is
-  separate from an executed DataGrip consumer suite.
 - [ ] Review the current API audit before publication: 1 internal factory
   reference, 11 experimental usages and 1 deprecated model-helper override per
   audited IDE. Three experimental references are in ProductHarvest; capturing the
@@ -63,9 +49,6 @@ not establish the live editor/connection experience.
   embedding has native information-schema inventories but lacks JDBC table-metadata
   RPCs. Do not promise a full database tree from those facts or invent a local
   native-model writer; a broader tree requirement needs a reviewed shared design.
-- [ ] Qualify namespace-changing operations before enabling UI-generated USE.
-  Readback and unset-scope seeding work independently; a zero update count cannot
-  prove a server namespace changed.
 - [ ] Prepare the shared reusable release workflow and final listing assets,
   trademark/licensing review and owner-only upload procedure. Commit/push is now
   authorized; GitHub releases/tags and Marketplace publication are not.
@@ -80,6 +63,26 @@ not establish the live editor/connection experience.
 
 ## Implemented and automatically checked
 
+- [x] Qualify saved-credential integration through Database Tools and a private real
+  Password Safe KeePass backend: encrypted reload, source/driver resolution,
+  replacement/copy isolation, memory-only exclusion and fresh reader JVMs. Spice
+  API keys use the ordinary password handshake, not saved Authorization properties.
+  The OS keychain UI and connection dialog remain manual installation checks.
+- [x] Add an opt-in DataFusion TLS-termination fixture without changing the pinned
+  backend, including trusted/untrusted root and hostname checks. Server-side
+  authorization is embedding-specific, not a universal DataFusion feature claim.
+- [x] Define the v1 cache-format compatibility policy and fail-closed tests. Unknown
+  library/native formats and malformed native data fall back; additive compatible
+  fields reload; another identity's cache is not migrated. No old published
+  consumer cache format is claimed to have a semantic migration path.
+- [x] Qualify namespace behavior: USE is rejected by both pinned endpoints; Arrow
+  19 setSchema is a silent no-op; explicit DataFusion schema SET is verified by
+  readback/query/reset/reconnect. Full-path generated UI switch/reset stays
+  unsupported rather than inventing multi-command or JDBC success. Reader and
+  introspection-scope behavior remain supported.
+- [x] Add a dedicated public-DSL SQL-only DataGrip consumer lane, without modifying
+  vendored conventions or transplanting Java/Kotlin. Actual DataGrip 261 and 262
+  execute the ordinary consumer suite with pure DataGrip runtime classpaths.
 - [x] Checkpoint and push the complete baseline, source, legal files and developer
   backlog to main. Initial safety checkpoint: 459380e.
 - [x] Both exact dialect/DBMS identities, explicit file mapping, parsing,

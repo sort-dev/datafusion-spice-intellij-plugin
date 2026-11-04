@@ -20,11 +20,18 @@ internal const val NAMESPACE_QUERY = "SELECT c.value AS catalog, s.value AS sche
     "FROM information_schema.df_settings c CROSS JOIN information_schema.df_settings s " +
     "WHERE c.name = 'datafusion.catalog.default_catalog' AND s.name = 'datafusion.catalog.default_schema'"
 
-internal val productSearchPath = CatalogSchemaSearchPath(
-    quote = '"', useSchema = "USE {catalog}.{schema}",
+private val namespaceReader = CatalogSchemaSearchPath(
+    quote = '"', useSchema = "",
     catalogProbes = listOf(NamespaceProbe.Column(NAMESPACE_QUERY, "catalog")),
     schemaProbes = listOf(NamespaceProbe.Column(NAMESPACE_QUERY, "schema")), schemaRequired = true,
 )
+
+// USE is rejected by both qualified endpoints; Arrow 19 setSchema is a silent
+// no-op. Keep this strategy read-only, not merely its database-dialect caller.
+internal val productSearchPath: CatalogSearchPathStrategy = object : CatalogSearchPathStrategy {
+    override fun switchSql(path: SearchPath): String? = null
+    override fun readBack(connection: DatabaseConnectionCore): SearchPath? = namespaceReader.readBack(connection)
+}
 
 /** Like Doris scope normalization, initialize only an unset scope, never a user's selection. */
 internal fun initializeProductScope(source: LocalDataSource, namespace: SearchPath): Boolean {

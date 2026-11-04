@@ -7,14 +7,17 @@ import java.util.Properties
 
 /** TLS/auth rejection checks on the runner's disposable Spice endpoint, not saved IDE credentials. */
 class FlightSqlSecurityTest : PluginPlatformTestCase() {
-    private fun query(root: String?, token: String?, host: String = "127.0.0.1") {
+    private fun query(root: String?, token: String?, host: String = "127.0.0.1", passwordAuth: Boolean = false) {
         check(System.getProperty("flight.test.product") == "spice")
         val url = requireNotNull(System.getProperty("flight.test.url"))
         require(url.startsWith("jdbc:arrow-flight-sql://127.0.0.1:") && url.endsWith("?useEncryption=true"))
         Class.forName("org.apache.arrow.driver.jdbc.ArrowFlightJdbcDriver")
         val properties = Properties().apply {
             root?.let { setProperty("tlsRootCerts", it) }
-            token?.let { setProperty("Authorization", "Bearer $it") }
+            if (passwordAuth) {
+                setProperty("user", "fixture")
+                setProperty("password", token.orEmpty())
+            } else token?.let { setProperty("Authorization", "Bearer $it") }
             setProperty("connectTimeoutMs", "3000")
         }
         DriverManager.getConnection(url.replace("//127.0.0.1:", "//$host:"), properties).use { connection ->
@@ -29,9 +32,9 @@ class FlightSqlSecurityTest : PluginPlatformTestCase() {
         }
     }
 
-    private fun rejects(root: String?, token: String?, expected: String, host: String = "127.0.0.1") {
+    private fun rejects(root: String?, token: String?, expected: String, host: String = "127.0.0.1", passwordAuth: Boolean = false) {
         try {
-            query(root, token, host)
+            query(root, token, host, passwordAuth)
             fail("The disposable endpoint accepted a rejected TLS/auth configuration")
         } catch (failure: SQLException) {
             // Check the reason without putting the token or raw driver message in assertions.
@@ -53,4 +56,10 @@ class FlightSqlSecurityTest : PluginPlatformTestCase() {
 
     fun testWrongHostnameIsRejected() = rejects(System.getenv("BRIKK_FLIGHT_TEST_TLS_ROOT"),
         System.getenv("BRIKK_FLIGHT_TEST_TOKEN"), "No name matching localhost", "localhost")
+
+    fun testApiKeyInPasswordAuthenticatesThroughTheJdbcHandshake() = query(
+        requireNotNull(System.getenv("BRIKK_FLIGHT_TEST_TLS_ROOT")), requireNotNull(System.getenv("BRIKK_FLIGHT_TEST_TOKEN")), passwordAuth = true)
+
+    fun testWrongApiKeyInPasswordIsRejected() = rejects(System.getenv("BRIKK_FLIGHT_TEST_TLS_ROOT"),
+        "invalid-fixture-key", "Invalid credentials", passwordAuth = true)
 }

@@ -3,7 +3,6 @@ package dev.sort.datafusionspice.live
 import com.intellij.database.dataSource.*
 import com.intellij.database.access.DatabaseCredentials
 import com.intellij.credentialStore.OneTimeString
-import com.intellij.database.dataSource.connection.ConnectionRequestor
 import com.intellij.database.console.JdbcConsole
 import com.intellij.database.console.session.DatabaseSessionManager
 import com.intellij.database.console.session.DatabaseSessionViewService
@@ -18,8 +17,6 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.PlatformCoreDataKeys
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext
-import com.intellij.database.psi.DbPsiFacade
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.FileDocumentManager
@@ -27,14 +24,10 @@ import com.intellij.openapi.util.Disposer
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.testFramework.PlatformTestUtil
 import com.intellij.testFramework.TestActionEvent
-import com.intellij.util.concurrency.AppExecutorUtil
-import com.intellij.util.ui.classpath.SimpleClasspathElementFactory
 import dev.brikk.house.sql.intellij.catalog.*
 import dev.brikk.house.sql.intellij.relation.RelationFactsResult
 import dev.brikk.house.sql.intellij.recoverEditorOperation
-import dev.sort.datafusionspice.PluginPlatformTestCase
-import dev.sort.datafusionspice.catalog.DatafusionLiveCatalogService
-import dev.sort.datafusionspice.catalog.SpiceLiveCatalogService
+import dev.sort.datafusionspice.credentials.PrivatePasswordSafe
 import dev.sort.datafusionspice.catalog.DatafusionExecutionObserver
 import dev.sort.datafusionspice.catalog.SpiceExecutionObserver
 import dev.sort.datafusionspice.pipes.DatafusionPipesSettings
@@ -42,88 +35,14 @@ import dev.sort.datafusionspice.pipes.SpicePipesSettings
 import dev.sort.datafusionspice.sql.DatafusionSqlDialect
 import dev.sort.datafusionspice.sql.SpiceSqlDialect
 import dev.brikk.house.sql.intellij.testing.setSqlDialectMapping
-import kotlinx.coroutines.runBlocking
 import java.nio.file.Files
 import java.nio.file.Path
+import java.io.StringReader
 import java.util.UUID
-import java.util.concurrent.Callable
 import java.util.concurrent.CopyOnWriteArrayList
 
 /** Opt-in: the IDE launches Arrow in its remote JDBC process against a runner-owned endpoint. */
-class RemoteFlightProcessTest : PluginPlatformTestCase() {
-    private lateinit var driver: DatabaseDriverImpl
-    private lateinit var source: LocalDataSource
-    private lateinit var catalog: LiveCatalogService
-    private val product get() = requireNotNull(System.getProperty("flight.test.product"))
-
-    override fun setUp() {
-        super.setUp()
-        require(product in setOf("spice", "datafusion"))
-        val url = requireNotNull(System.getProperty("flight.test.url"))
-        require(url.startsWith("jdbc:arrow-flight-sql://127.0.0.1:"))
-        project.basePath?.let { Files.createDirectories(Path.of(it)) }
-        val drivers = DatabaseDriverManager.getInstance()
-        driver = requireNotNull(drivers.getDriver("$product-brikk-flight")).copy("remote-flight-${UUID.randomUUID()}", false) as DatabaseDriverImpl
-        driver.artifacts = emptyList()
-        val jar = requireNotNull(System.getProperty("test.flightDriverJar"))
-        driver.additionalClasspathElements = SimpleClasspathElementFactory.createElements("jar://$jar!/")
-        drivers.updateDriver(driver)
-        source = LocalDataSource().apply {
-            name = "disposable $product remote process"
-            databaseDriver = driver
-            this.url = url
-            if (product == "datafusion") {
-                username = "fixture"
-                passwordStorage = LocalDataSource.Storage.MEMORY
-            }
-            isAutoSynchronize = false
-            isKeepAlive = false
-            workingDir = Files.createDirectories(Path.of("build", "remote-flight-working-dir")).toAbsolutePath().toString()
-            System.getenv("BRIKK_FLIGHT_TEST_TLS_ROOT")?.let { driverProperties["tlsRootCerts"] = it }
-            System.getenv("BRIKK_FLIGHT_TEST_TOKEN")?.let { driverProperties["Authorization"] = "Bearer $it" }
-        }
-        if (product == "datafusion") DatabaseCredentials.getInstance().setPassword(source, OneTimeString("fixture"))
-        LocalDataSourceManager.getInstance(project).addDataSource(source)
-        catalog = ApplicationManager.getApplication().getService(if (product == "spice")
-            SpiceLiveCatalogService::class.java else DatafusionLiveCatalogService::class.java)
-    }
-
-    override fun tearDown() {
-        try {
-            if (::source.isInitialized) {
-                if (::catalog.isInitialized) catalog.forget(source.uniqueId)
-                LocalDataSourceManager.getInstance(project).removeDataSource(source)
-                DbPsiFacade.getInstance(project).clearCaches()
-            }
-            if (::driver.isInitialized) DatabaseDriverManager.getInstance().removeDriver(driver)
-            PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
-        } finally { super.tearDown() }
-    }
-
-    private fun <T> background(body: suspend () -> T): T {
-        val future = AppExecutorUtil.getAppExecutorService().submit(Callable { runBlocking { body() } })
-        try {
-            PlatformTestUtil.waitWithEventsDispatching("remote Flight operation finishes", { future.isDone }, 45)
-            return future.get()
-        } finally { if (!future.isDone) future.cancel(true) }
-    }
-
-    private suspend fun <T> connection(body: (DatabaseConnection) -> T): T =
-        requireNotNull(DatabaseConnectionManager.getInstance().build(project, source)
-            .setRequestor(ConnectionRequestor.Anonymous()).create()).use { body(it.get()) }
-
-    private fun scalar(connection: DatabaseConnection, sql: String): String? {
-        val statement = connection.remoteConnection.createStatement()
-        try {
-            statement.setQueryTimeout(10)
-            val rows = statement.executeQuery(sql)
-            try {
-                assertTrue(rows.next())
-                return rows.getString(1).also { assertFalse(rows.next()) }
-            } finally { rows.close() }
-        } finally { statement.close() }
-    }
-
+class RemoteFlightProcessTest : RemoteFlightTestCase() {
     fun testActualRemoteDriverLaunchHarvestAndInitialScope() {
         assertTrue(source.databaseVersion.version.isEmpty())
         val before = catalog.profile.identity(source)
@@ -158,6 +77,52 @@ class RemoteFlightProcessTest : PluginPlatformTestCase() {
 
     fun testFreshRemoteConnectionsWorkAfterClose() {
         repeat(2) { background { connection { assertEquals("1", scalar(it, "SELECT 1")) } } }
+    }
+
+    fun testSavedPasswordSafeCredentialsReloadForConsoleAndHelperConnections() {
+        val external = System.getenv("BRIKK_FLIGHT_CREDENTIAL_DIRECTORY")
+        val parent = Files.createDirectories(Path.of("build", "readiness")).toRealPath()
+        val directory = external?.let { Path.of(it).toRealPath() }
+            ?: Files.createTempDirectory(parent, "saved-flight-")
+        require(directory.startsWith(parent) && directory.fileName.toString().startsWith("saved-flight-"))
+        if (external == null) Disposer.register(testRootDisposable) { directory.toFile().deleteRecursively() }
+        val vault = PrivatePasswordSafe(directory)
+        Disposer.register(testRootDisposable) { vault.close() }
+        vault.install(testRootDisposable)
+        val phase = System.getenv("BRIKK_FLIGHT_CREDENTIAL_PHASE") ?: "roundtrip"
+        require(phase in setOf("write", "read", "roundtrip"))
+        val state = directory.resolve("data-source.xml")
+        val secret = System.getenv("BRIKK_FLIGHT_TEST_TOKEN") ?: "fixture"
+        source.username = "fixture"
+        if (phase == "read") {
+            LocalDataSourceManager.getInstance(project).removeDataSource(source)
+            source = LocalDataSource()
+            LocalDataSourceSerialization.deserialize(project, source, StringReader(Files.readString(state)))
+            source.resolveDriver()
+            assertSame("Reload must bind the reconstructed fixture driver", driver, source.databaseDriver)
+            LocalDataSourceManager.getInstance(project).addDataSource(source)
+        } else {
+            source.passwordStorage = LocalDataSource.Storage.PERSIST
+            DatabaseCredentials.getInstance().storePassword(source, OneTimeString(secret))
+            Files.writeString(state, LocalDataSourceSerialization.serializedSettings(project, source).toString())
+            vault.save()
+            if (phase == "roundtrip") {
+                vault.reopen()
+                LocalDataSourceSerialization.deserialize(project, source, StringReader(Files.readString(state)))
+                source.resolveDriver()
+            }
+        }
+        assertEquals(LocalDataSource.Storage.PERSIST, source.passwordStorage)
+        assertTrue("The password must be loaded from the private persisted store",
+            DatabaseCredentials.getInstance().loadPassword(source)?.toString() == secret)
+        assertFalse(source.url.orEmpty().contains("password="))
+        assertFalse(source.driverProperties.containsKey("Authorization"))
+        val xml = Files.readString(state)
+        if (System.getenv("BRIKK_FLIGHT_TEST_TOKEN") != null) assertFalse("API key leaked into saved settings", xml.contains(secret))
+        assertFalse(xml.contains("<password>"))
+        background { connection { assertEquals("1", scalar(it, "SELECT 1")) } }
+        assertInstanceOf(background { catalog.refresh(project, source) }, RefreshOutcome.Refreshed::class.java)
+        realConsole(changeInventory = false)
     }
 
     fun testRealConsoleExecutePipeAndManualRefresh() = realConsole(changeInventory = false)

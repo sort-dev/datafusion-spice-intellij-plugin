@@ -5,6 +5,13 @@ confirmation. The plugin is still a development build, not a published or fully
 qualified release. Earlier exploratory results are in
 [archive/local-baseline-testing.md](archive/local-baseline-testing.md).
 
+The engineering follow-up is recorded in
+[engineering-qualification.md](engineering-qualification.md). Ordinary tests are
+green, but two desired-contract real-helper race tests fail on released support
+0.4.0. The owner has requested an upstream local snapshot candidate; its consumer
+verification and final build are pending. Do not treat the passing totals below
+as a pass of those race contracts.
+
 ## Standard runtime checks
 
 Build JDK 21.0.2, Gradle 9.0.0, Kotlin 2.4.10, SQL 0.23.0 and IntelliJ
@@ -15,10 +22,13 @@ support/JDBC/test support 0.4.0. Tests use each IDE's bundled runtime.
 ./gradlew test test262 test263 -Ptest.kotlin=present
 ```
 
-The standard suite passes 72 tests per runtime with zero failures/errors/skips,
-432 executions across the two Kotlin modes. The latest local pass is recorded in
-`build/nap/final-validation.log`; clean-commit XML and checked summaries are under
-`build/nap/final-matrix-absent/` and `final-matrix-present/`.
+The expanded standard suite passes 84 tests per runtime with zero
+failures/errors/skips, 504 executions across the two Kotlin modes. The latest
+serialized local pass is `build/engineering/serial-resume.log`; XML and checked
+summaries are under `build/engineering/stable84-absent/` and `stable84-present/`.
+Actual DataGrip 261/262 each pass the same 84-test suite in a dedicated SQL-only
+lane, with only the chosen DataGrip SDK on the runtime classpath. Their evidence
+is under `build/engineering/stable84-datagrip-261/` and `stable84-datagrip-262/`.
 The global physical-reference search was also rerun on all three runtimes in
 `build/nap/physical-indexed-matrix.log` and `physical-indexed-xml/`.
 The earlier 63-test lifecycle evidence remains under `build/lifecycle/`.
@@ -70,11 +80,10 @@ Coverage now includes:
 The suite captures background logged errors. Live server and isolated-loader
 classes are excluded from this normal matrix and run separately below.
 
-The first-connection identity fix adds four standard identity checks, and the
-editor/cancellation pass adds five. Both Kotlin modes pass on all three runtimes;
-earlier evidence is preserved, not relabeled. The DataGrip headless probe stopped
-before tests because shared conventions require an unavailable Java host plugin.
-That limitation is recorded separately; no DataGrip consumer-suite pass is claimed.
+Saved-credential persistence/isolation, fail-closed cache formats, namespace
+advertisement and quoted physical-reference/host cases extend the earlier suite.
+The earlier DataGrip probe's Java-host dependency failure is superseded by the
+public-DSL SQL-only lane; no vendored code or SDK plugins were patched/transplanted.
 
 ## Real disposable Flight SQL fixtures
 
@@ -122,12 +131,11 @@ updates / NULL bindings. A returned update count is not treated as execution suc
 python3 tools/run-flight-smoke.py --product spice --spice-secure --java-home /path/to/jdk21
 ```
 
-All 11 checks pass on Spice 2.4.0 with Arrow JDBC 19.0.0: the six server checks
-above over TLS, a trusted-certificate/valid-key query, and rejection of missing and
-invalid keys, an untrusted certificate and a mismatched hostname. Certificate
-verification remains enabled. Negative tests check the distinct observed reasons,
-not merely any exception. The original standalone record uses 261; the remote
-matrix below repeats these checks on all three runtimes.
+Spice 2.4.0 / Arrow JDBC 19.0.0 checks cover header and normal password-handshake
+API-key authentication, missing/invalid keys, untrusted roots and mismatched
+hostnames. Certificate verification stays enabled. Negative tests check the
+distinct observed reasons, not merely any exception. The expanded transport
+matrix below repeats these checks on all three IDEA runtimes and actual DataGrip.
 
 The runner generates one-day test certificates and a random API key in a private
 temporary fixture directory. Spice reads a read-only mount; instance state lives
@@ -136,11 +144,12 @@ containers are removed and temporary keys/certificates are deleted in cleanup.
 The key goes to the test JVM through its environment, not a JDBC URL or command
 argument. Saved fixture logs redact it. No IDE credential store is changed.
 
-The test uses Arrow's `tlsRootCerts` property and its non-reserved RPC-header
-properties to send `Authorization: Bearer <fixture-key>` on each call, matching
-[Spice's documented Flight policy](https://spiceai.org/docs/api/auth). This is a
-direct JDBC fixture, not qualification of Password Safe, the driver dialog or
-production authentication. DataFusion TLS/auth and cancellation remain open.
+Direct header tests use Arrow's `tlsRootCerts` and non-reserved RPC-header
+properties. Real SDK sources instead use the ordinary password handshake and
+Database Tools' credential API, including a private persisted Password Safe
+backend and fresh reader JVMs. DataFusion now has its own TLS-termination fixture.
+See engineering-qualification.md for the exact storage, transport and pending-RPC
+cancellation boundaries; none of this requests production credentials.
 
 Evidence: `build/lifecycle/secure-runner.log`,
 `build/readiness/spice-secure-live-tests.log`, `spice-secure-live-status.json`,
@@ -148,7 +157,7 @@ Evidence: `build/lifecycle/secure-runner.log`,
 
 ### IDE remote JDBC process
 
-`--ide-process` adds five checks through an actual IDE-launched Arrow JDBC
+`--ide-process` adds six checks through an actual IDE-launched Arrow JDBC
 process: first-connect native inventory/default scope and inherited VM flags,
 helper refresh that must skip an invalid user startup script, and healthy fresh
 connections after close. The fourth opens a real `JdbcConsole`, uses the actual
@@ -161,25 +170,31 @@ view is queryable while the metadata cache stays old, then requires manual Refre
 to update native inventory/editor-facts revision without editing the document.
 Spice uses a runner-owned pod reload; DataFusion uses the same session's raw
 connection. See [out-of-band-refresh.md](out-of-band-refresh.md).
+The sixth reloads encrypted saved credentials and uses them for a driver
+connection, a helper refresh and an actual console. Three additional namespace
+contract checks distinguish real SET behavior from rejected USE and no-op JDBC
+setSchema. `--saved-credentials-restart` runs the persistence case in separate
+writer/reader JVMs rather than merely reopening a backend in one process.
 `--test-task test262` or `test263` selects another
 configured runtime. See [remote-driver-qualification.md](remote-driver-qualification.md).
 
-Both plaintext products pass all eleven checks on 261/262/263, including the six
-direct JDBC checks. Reports are in
+Both plaintext products pass 15 checks on 261/262/263. Secure Spice passes 22,
+and TLS-terminated DataFusion passes 18. Reports are in
 `build/readiness/<product>-remote-<task>-test-results/` and the matching
 `-live-tests.log`; the final runner matrix is
-`build/nap/out-of-band-runtime-matrix.log`. The first attempted run reproduced inventory
+`build/engineering/serial-resume.log`. The first attempted run reproduced inventory
 loss before the consumer identity fix. This is still not interactive installation
 or production credential-store qualification.
-The secure Spice variant passes all 16 checks on each runtime, including five
-real remote-process checks and the five TLS/auth checks. Across both plaintext
-products and secure Spice this is 114 successful executions, with no
-failures/errors/skips. Evidence is in
-`build/readiness/spice-secure-remote-<task>-test-results/`; a final three-runtime
-XML snapshot and machine-readable counts are in `build/nap/out-of-band-xml-snapshot/`.
-The DataFusion remote source supplies its synthetic password through Database
-Tools' in-memory credentials API rather than adding it to the saved URL. Persistent
-Password Safe/OS-keychain and production authorization remain unqualified.
+The four transport/product variants total 210 passing IDEA executions. Separate
+credential writer/reader JVMs add 12; active-stream cancellation/recovery adds
+six, with the observed cancel calls returning in 1 to 3 ms. Actual secure console
+runs on DataGrip 261/262 add 80. There are 308 passing live executions in total,
+separate from the four failing desired-contract Brikk race reproductions.
+Raw directories and counts are recorded in
+`build/engineering/passing-live-summary.json`. Runtime-specific cancellation
+records are `build/readiness/live/*-stream-cancellation-<build>.txt`.
+DataGrip live XML and exact product-info are preserved under
+`build/engineering/stable-datagrip-live-<generation>-<product>/`.
 
 ## Private classloaders and sibling coexistence
 
@@ -220,9 +235,10 @@ connection-hook APIs include three references in this plugin's ProductHarvest.
 Capturing Project before the EDT handoff removed four unnecessary ProtoConnection
 references; no allowance or suppression was added.
 
-The audited development label is
-`0.1.0-dev.202611031759+b02c3dbbe823.dirty`, including the first-connection identity
-fix. Exact input versions and complete reports are in `build/nap/identity-verifier.log` and
+The latest audited development label is
+`0.1.0-dev.202611031917+7a970b8d628f.dirty`, including the read-only namespace
+strategy. Exact input versions and reports are in `build/engineering/plugin-verifier.log`,
+`build/engineering/verifier-verdicts.json` and
 `build/reports/pluginVerifier/`. A subsequent commit-derived packaging label is
 not by itself a new verifier audit. `api-usage-approvals.txt` remains empty of
 exemptions: **Compatible is not publication approval**.
@@ -262,6 +278,11 @@ distribution verification and all 72 tests in an isolated Kotlin-absent runtime 
 installed IntelliJ 2026.2.1 / 262.9437.185. The summaries record the exact clean
 commit and an empty worktree status. Installed-IDE metadata and XML are in
 `build/nap/final-installed-ide.json` and `final-installed-runtime/`.
+
+The 17ad87d ZIP above predates this engineering follow-up. The new candidate will
+only be built after the authorized upstream snapshot passes the failed race
+contracts. Candidate versions use `0.1.0-qualification-dev.*`, never a relabeled
+stable release. See engineering-qualification.md for the snapshot gate.
 
 The user's live-window symptoms, driver-dialog upgrades, clean interactive installs,
 production TLS/auth policy, cross-library cache migration and full DataFusion

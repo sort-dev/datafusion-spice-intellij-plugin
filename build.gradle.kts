@@ -3,7 +3,9 @@ plugins {
 }
 
 group = "dev.sort.datafusionspice"
-version = "0.1.0"
+val supportCandidate = providers.gradleProperty("qualification.brikkSupportVersion")
+    .orElse(providers.environmentVariable("BRIKK_SUPPORT_CANDIDATE"))
+version = if (supportCandidate.isPresent) "0.1.0-qualification" else "0.1.0"
 
 sqlDialectPlugin {
     kotlinTests = false
@@ -55,12 +57,48 @@ tasks.withType<Test>().configureEach {
     if (liveUrl == null) {
         exclude("**/live/**")
     } else {
+        // An external fixture is state, not a reproducible Gradle task input.
+        // In particular both halves of the credential-restart lane must execute.
+        outputs.upToDateWhen { false }
+        outputs.cacheIf { false }
         if (!providers.environmentVariable("BRIKK_FLIGHT_TEST_TLS_ROOT").isPresent) {
             exclude("**/live/FlightSqlSecurityTest*")
+            exclude("**/live/FlightTlsContractTest*")
         }
+        if (providers.environmentVariable("BRIKK_FLIGHT_TEST_PRODUCT").orNull != "datafusion") exclude("**/live/FlightTlsContractTest*")
+        if (providers.environmentVariable("BRIKK_FLIGHT_TEST_PRODUCT").orNull != "spice") exclude("**/live/FlightSqlSecurityTest*")
+        if (providers.environmentVariable("BRIKK_FLIGHT_TEST_LIFECYCLE_PROBE").orNull != "true") exclude("**/live/SharedFlightCatalogRaceTest*")
+        if (providers.environmentVariable("BRIKK_FLIGHT_TEST_CANCELLATION_PROBE").orNull != "true") exclude("**/live/FlightCancellationTest*")
         systemProperty("flight.test.url", liveUrl)
         systemProperty("flight.test.product", providers.environmentVariable("BRIKK_FLIGHT_TEST_PRODUCT").get())
         systemProperty("flight.test.output", layout.buildDirectory.dir("readiness/live").get().asFile.absolutePath)
         jvmArgs("--add-opens=java.base/java.nio=ALL-UNNAMED", "--sun-misc-unsafe-memory-access=allow")
+    }
+}
+
+// Public IntelliJ testing DSL, scoped to an explicitly supplied DataGrip install.
+// The shared IU lanes request Java/Kotlin bundled hosts even in absent mode;
+// this SQL-only consumer lane requests only plugins DataGrip actually bundles.
+providers.gradleProperty("test.dataGripIde").orNull?.let { installation ->
+    extensions.configure<org.jetbrains.intellij.platform.gradle.extensions.IntelliJPlatformTestingExtension> {
+        testIde.register("testDataGrip") {
+            type.set(org.jetbrains.intellij.platform.gradle.IntelliJPlatformType.DataGrip)
+            localPath.set(file(installation))
+            testFramework(org.jetbrains.intellij.platform.gradle.TestFrameworkType.Platform)
+            plugins {
+                bundledPlugins(listOf("com.intellij.database", "com.intellij.modules.json", "Git4Idea"))
+            }
+            task {
+                useJUnit()
+                systemProperty("java.awt.headless", "true")
+                systemProperty("test.kotlin", "absent")
+                systemProperty("test.pluginIsolation", "false")
+                systemProperty("test.siblingPlugins", "")
+                exclude("**/brikk/**", "**/PluginIsolationTest*")
+                jvmArgumentProviders.add(org.gradle.process.CommandLineArgumentProvider {
+                    listOf("-Didea.load.plugins.id=com.intellij.database,Git4Idea,dev.sort.datafusion-spice-intellij-plugin")
+                })
+            }
+        }
     }
 }

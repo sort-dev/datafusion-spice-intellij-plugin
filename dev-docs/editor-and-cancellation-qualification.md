@@ -47,3 +47,9 @@ The failure is recorded in `build/nap/datagrip-probe.log`. No DataGrip test pass
 is claimed from this attempt. The five-target Plugin Verifier result is separate.
 Do not patch the vendored conventions or load an arbitrary IDEA Java plugin into
 DataGrip to turn this qualification gap into a nominal pass.
+
+This old lane failure is superseded by the dedicated public-DSL SQL-only lane in
+[engineering qualification](engineering-qualification.md#datagrip-consumer-lane).
+It executes the expanded suite on actual DataGrip 261 and 262 without Java/Kotlin
+transplants or a mixed IDEA runtime classpath. The earlier failed log remains
+historical evidence, not the current qualification verdict.

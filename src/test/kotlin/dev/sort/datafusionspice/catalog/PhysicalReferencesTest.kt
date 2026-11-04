@@ -24,7 +24,7 @@ import java.util.UUID
 
 /** Real platform model symbols and indexed PSI references; no database rename or SQL execution. */
 class PhysicalReferencesTest : PluginPlatformTestCase() {
-    private fun each(body: (LocalDataSource, String) -> Unit) {
+    private fun each(quoted: Boolean = false, body: (LocalDataSource, String) -> Unit) {
         for ((product, language) in listOf("spice" to SpiceSqlDialect, "datafusion" to DatafusionSqlDialect)) {
             val driver = requireNotNull(DatabaseDriverManager.getInstance().getDriver("$product-brikk-flight"))
             val model = ModelFactory.BLACK_HOLE.createModel(requireNotNull(driver.forcedDbms))
@@ -37,17 +37,19 @@ class PhysicalReferencesTest : PluginPlatformTestCase() {
             }
             val root = model.root as PgRoot
             for (schema in listOf("public", "other")) {
-                val table = root.databases.createOrGet(product).schemas.createOrGet(schema).tables.createOrGet("sample")
-                table.columns.createOrGet("id")
-                table.columns.createOrGet("name")
+                val table = root.databases.createOrGet(product).schemas.createOrGet(schema).tables.createOrGet(if (quoted) "events.part" else "sample")
+                table.columns.createOrGet(if (quoted) "Odd.Column" else "id")
+                table.columns.createOrGet(if (quoted) "Δ value" else "name")
                 source.introspectionScope = CatalogScopes.widen(source.introspectionScope,
                     CatalogScopes.select(listOf(ObjectKind.DATABASE, ObjectKind.SCHEMA), listOf(product, schema)))
             }
             LocalDataSourceManager.getInstance(project).addDataSource(source)
             try {
                 DbPsiFacade.getInstance(project).clearCaches()
-                val sql = "SELECT p.id, q.id, p.id AS picked, 'id' AS literal FROM $product.public.sample p " +
-                    "JOIN $product.other.sample q ON p.id = q.id"
+                val sql = if (quoted) "SELECT p.\"Odd.Column\", q.\"Odd.Column\", p.\"Odd.Column\" AS picked, p.\"Δ value\", 'Odd.Column' AS literal " +
+                    "FROM \"$product\".\"public\".\"events.part\" p JOIN \"$product\".\"other\".\"events.part\" q ON p.\"Odd.Column\" = q.\"Odd.Column\""
+                    else "SELECT p.id, q.id, p.id AS picked, 'id' AS literal FROM $product.public.sample p " +
+                        "JOIN $product.other.sample q ON p.id = q.id"
                 val file = myFixture.addFileToProject("physical-${UUID.randomUUID()}.sql", sql)
                 setSqlDialectMapping(project, file.virtualFile, language, testRootDisposable)
                 myFixture.configureFromExistingVirtualFile(file.virtualFile)
@@ -90,5 +92,31 @@ class PhysicalReferencesTest : PluginPlatformTestCase() {
         assertEquals("SELECT p.renamed, q.id, p.renamed AS picked, 'id' AS literal FROM $product.public.sample p " +
             "JOIN $product.other.sample q ON p.renamed = q.id", myFixture.file.text)
         assertEquals("id", column.name)
+    }
+
+    fun testQuotedDottedAndUnicodePhysicalNamesResolveWithoutSplittingIdentifiers() = each(quoted = true) { source, product ->
+        val table = ((source.model as BasicModel).root as PgRoot).databases.single { it.name == product }
+            .schemas.single { it.name == "public" }.tables.single { it.name == "events.part" }
+        for ((name, count) in listOf("Odd.Column" to 3, "Δ value" to 1)) {
+            val target = requireNotNull(DbPsiFacade.getInstance(project).findDataSource(source.uniqueId)?.findElement(table.columns.single { it.name == name }))
+            val usages = ReferencesSearch.search(target).findAll().filter { it.element.containingFile == myFixture.file }
+            assertEquals(usages.toString(), count, usages.size)
+            assertTrue(usages.all { it.isReferenceTo(target) })
+        }
+    }
+
+    fun testQuotedPhysicalReferenceRenamePreservesOtherSchemaAndLiteral() = each(quoted = true) { source, product ->
+        val column = ((source.model as BasicModel).root as PgRoot).databases.single { it.name == product }
+            .schemas.single { it.name == "public" }.tables.single { it.name == "events.part" }.columns.single { it.name == "Odd.Column" }
+        val target = requireNotNull(DbPsiFacade.getInstance(project).findDataSource(source.uniqueId)?.findElement(column))
+        val usages = ReferencesSearch.search(target).findAll().filter { it.element.containingFile == myFixture.file }
+        assertEquals(3, usages.size)
+        WriteCommandAction.runWriteCommandAction(project) {
+            usages.sortedByDescending { it.element.textOffset }.forEach { it.handleElementRename("renamed.value") }
+        }
+        PsiDocumentManager.getInstance(project).commitAllDocuments()
+        assertEquals("SELECT p.\"renamed.value\", q.\"Odd.Column\", p.\"renamed.value\" AS picked, p.\"Δ value\", 'Odd.Column' AS literal " +
+            "FROM \"$product\".\"public\".\"events.part\" p JOIN \"$product\".\"other\".\"events.part\" q ON p.\"renamed.value\" = q.\"Odd.Column\"", myFixture.file.text)
+        assertEquals("Odd.Column", column.name)
     }
 }

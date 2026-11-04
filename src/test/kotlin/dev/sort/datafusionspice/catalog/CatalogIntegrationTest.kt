@@ -90,6 +90,18 @@ class CatalogIntegrationTest : PluginPlatformTestCase() {
         assertNull(DatafusionDatabaseDialect().tryToLoadSearchPath(metadataConnection("datafusion", null, mutableListOf())))
     }
 
+    fun testNeitherProductAdvertisesUnsupportedSqlOrSilentJdbcNamespaceSwitching() {
+        for (dialect in listOf(DatafusionDatabaseDialect(), SpiceDatabaseDialect())) {
+            val path = namespace(if (dialect is SpiceDatabaseDialect) "spice" else "datafusion", "information_schema")
+            assertNull(dialect.sqlSetSearchPath(path))
+            assertNull(dialect.sqlResetSearchPath())
+            assertNull(productSearchPath.switchSql(path))
+            assertFalse(dialect.shouldSwitchThroughJdbc(ObjectKind.SCHEMA))
+            assertFalse(dialect.shouldSwitchThroughJdbc(ObjectKind.DATABASE))
+            assertFalse(com.intellij.database.util.DbImplUtil.canSwitchTo(path, dialect))
+        }
+    }
+
     fun testBothProductsUseTheirNativeResolversForLazyIntrospection() {
         assertSame(datafusionCatalog.dataSources, project.service<DatafusionAutoIntrospectService>().profile.dataSources)
         assertSame(spiceCatalog.dataSources, project.service<SpiceAutoIntrospectService>().profile.dataSources)

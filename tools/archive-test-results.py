@@ -18,7 +18,7 @@ def archive_results(source, destination, tasks):
     destination.mkdir(parents=True, exist_ok=False)
     lanes = {}
     for task in tasks:
-        if task not in ("test", "test262", "test263"):
+        if task not in ("test", "test262", "test263", "testDataGrip"):
             raise ValueError(f"Unsupported task: {task}")
         files = sorted((source / task).glob("TEST-*.xml"))
         counts = dict.fromkeys(COUNTS, 0)
@@ -58,7 +58,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", type=Path, default=ROOT / "build/test-results")
     parser.add_argument("--destination", type=Path, required=True)
-    parser.add_argument("--tasks", nargs="+", choices=["test", "test262", "test263"], default=["test", "test262", "test263"])
+    parser.add_argument("--tasks", nargs="+", choices=["test", "test262", "test263", "testDataGrip"], default=["test", "test262", "test263"])
     parser.add_argument("--require-passing", action="store_true", help="Fail for missing, failed, invalid or skipped results")
     args = parser.parse_args()
     result = archive_results(args.source, args.destination, args.tasks)

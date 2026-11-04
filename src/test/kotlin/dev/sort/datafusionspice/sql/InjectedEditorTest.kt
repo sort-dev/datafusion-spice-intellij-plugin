@@ -28,12 +28,12 @@ class InjectedEditorTest : PluginPlatformTestCase() {
         Disposer.register(testRootDisposable) { settings.AUTOCOMPLETE_ON_CODE_COMPLETION = previous }
     }
 
-    private fun inject(language: DatafusionFamilyDialect, sql: String): Pair<SqlStringLiteralExpression, com.intellij.psi.PsiFile> {
-        val delimiter = "${'$'}body${'$'}"
+    private fun inject(language: DatafusionFamilyDialect, sql: String, delimiter: String = "${'$'}body${'$'}"): Pair<SqlStringLiteralExpression, com.intellij.psi.PsiFile> {
         val host = "SELECT $delimiter$sql$delimiter"
         myFixture.configureFromExistingVirtualFile(LightVirtualFile("injected-${UUID.randomUUID()}.sql", PgDialect.INSTANCE, host))
         val literal = requireNotNull(PsiTreeUtil.findChildOfType(myFixture.file, SqlStringLiteralExpression::class.java))
         val hostFile = myFixture.file
+        val hostVirtualFile = hostFile.virtualFile
         val hostStart = literal.textRange.startOffset
         val manager = InjectedLanguageManager.getInstance(project)
         manager.registerMultiHostInjector(object : MultiHostInjector {
@@ -41,7 +41,8 @@ class InjectedEditorTest : PluginPlatformTestCase() {
                 val host = context as? SqlStringLiteralExpression ?: return
                 // Completion works on a copied file containing a dummy identifier.
                 // Keep the explicit claim on that copy, not just the original PSI object.
-                if (host.containingFile.originalFile !== hostFile || host.textRange.startOffset != hostStart) return
+                if (manager.isInjectedFragment(host.containingFile)) return
+                if (host.containingFile.originalFile.virtualFile != hostVirtualFile || host.textRange.startOffset != hostStart) return
                 registrar.startInjecting(language).addPlace(null, null, host,
                     TextRange(delimiter.length, host.textLength - delimiter.length)).doneInjecting()
             }
@@ -82,6 +83,13 @@ class InjectedEditorTest : PluginPlatformTestCase() {
             assertTrue(host, host.endsWith("${'$'}body${'$'}"))
             assertTrue(host, host.contains("regexp_like", ignoreCase = true))
             assertFalse(injected.text.contains("${'$'}body${'$'}"))
+        }
+    }
+
+    fun testSingleQuotedHostsWithoutEscapesKeepBothExplicitParserIdentities() {
+        for (language in listOf(DatafusionSqlDialect, SpiceSqlDialect)) {
+            val (_, injected) = inject(language, "SELECT 1 AS n", "'")
+            assertEmpty(PsiTreeUtil.findChildrenOfType(injected, PsiErrorElement::class.java))
         }
     }
 }

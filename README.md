@@ -19,11 +19,32 @@ The DataFusion and Spice data-source templates use Apache Arrow Flight SQL JDBC
 DataFusion is an embedding library, not a universal server: a deployment must expose
 the Flight SQL and information-schema contract used by this plugin.
 
+For a Spice endpoint with API-key authentication, use the IDE's username/password
+authentication fields. Supply a nonempty username, such as `spice`, and put the
+API key in the **Password** field; Spice uses the password as the key and ignores
+the username. Let Database Tools/Password Safe remember it if desired. Do not put
+the key in the JDBC URL or an ordinary advanced driver property. This route is
+verified with Spice 2.4.0 and Arrow JDBC 19.0.0. Keep TLS certificate verification
+enabled for authenticated remote connections.
+
 After connecting, the plugin reads the current catalog and schema. A new data
 source's unset introspection scope selects that reported default namespace;
 existing schema selections are preserved. Completion and SQL references can
 request unloaded namespaces as you type or open a query. Catalog changes restart
 editor analysis without requiring a text edit.
+
+### Current namespace
+
+Reading the server's current catalog/schema and selecting schemas to introspect
+are supported. The plugin does not generate console namespace-switch/reset SQL.
+`USE` is rejected by the tested DataFusion 55.2.0 embedding and Spice 2.4.0, and
+Arrow JDBC 19.0.0's `setSchema` returns without changing the server namespace.
+
+On the tested DataFusion embedding, an explicitly executed command such as
+`SET datafusion.catalog.default_schema = 'analytics'` changes that connection's
+default schema. The target schema must exist. This does not promise equivalent
+support in every embedding; Spice 2.4.0 rejects this `SET` operation. Merely
+changing IDE introspection selections does not execute it.
 
 Both driver templates define the required VM options. In **Data Sources and
 Drivers**, select the **Drivers** tab, then **Spice (sort.dev)** or
