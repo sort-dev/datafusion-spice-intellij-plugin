@@ -71,7 +71,8 @@ class CatalogRefreshFeedbackTest : PluginPlatformTestCase() {
         }
         assertEquals(3, received.size)
         assertTrue(received[0].content.contains("metadata was left unchanged"))
-        assertTrue(received[1].content.contains("Connection settings changed"))
+        assertTrue(received[1].content.contains("superseded"))
+        assertTrue(received[1].content.contains("newer refresh"))
         assertTrue(received[2].content.contains("transaction"))
         assertTrue(received.none { it.content.contains("refreshed") })
     }

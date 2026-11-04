@@ -32,7 +32,7 @@ internal fun catalogRefreshCompleted(
         is RefreshOutcome.HarvestFailed -> NotificationType.WARNING to
             "Catalog refresh did not complete. Existing metadata was left unchanged."
         RefreshOutcome.Superseded -> NotificationType.INFORMATION to
-            "Connection settings changed during catalog refresh. Refresh again using the new settings."
+            "Catalog refresh was superseded by a connection change or a newer refresh. Refresh again if needed."
         RefreshOutcome.SessionInTransaction -> NotificationType.INFORMATION to
             "Catalog refresh was skipped to avoid interfering with the console transaction."
         RefreshOutcome.Disabled -> return

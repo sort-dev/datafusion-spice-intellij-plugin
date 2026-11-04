@@ -9,6 +9,24 @@ Sortdev SRL, from https://github.com/brikk/brikk-sql:
 - `brikk-sql-intellij-support:0.4.0`
 - `brikk-sql-intellij-jdbc-support:0.4.0`
 
+## Owner-authorized local qualification candidate
+
+Ordinary builds use the released coordinates above. Only when the explicit
+qualification override is supplied, the two IntelliJ runtime artifacts are
+replaced with the following Apache License 2.0 local SNAPSHOT publications,
+Copyright Brikk / Sortdev SRL:
+
+- `brikk-sql-intellij-support:0.4.1-livecatalog-races-20261104-g2a46bd08efcd-SNAPSHOT`
+- `brikk-sql-intellij-jdbc-support:0.4.1-livecatalog-races-20261104-g2a46bd08efcd-SNAPSHOT`
+
+Candidate source commit: `2a46bd08efcde21e080e8f0a88d68fc997383fc8` in
+https://github.com/brikk/brikk-sql. SQL core/metadata/verification API remain at
+released 0.23.0. This is not a stable/public release. The aligned candidate
+test-support artifact remains test-only and is not embedded. The upstream
+licenses and inherited notices below apply unchanged.
+
+## Inherited Brikk SQL notices
+
 Brikk SQL includes a Kotlin port of SQLGlot and portions derived from polyglot
 and DuckDB, under the MIT license:
 

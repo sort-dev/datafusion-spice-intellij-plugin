@@ -30,6 +30,10 @@ not establish the live editor/connection experience.
   second consumer cache/generation manager or a locally patched library. Broader
   reconnect/disposal ordering remains a related qualification gate. See
   engineering-qualification.md for commands and ownership.
+  The owner-authorized upstream snapshot now passes both real consumer contracts
+  on IDEA 261/262/263 and actual DataGrip 261/262. The ordinary default remains
+  released 0.4.0; formal release adoption is still a separate gate. See
+  candidate-verification.md for exact inputs and qualification evidence.
 - [ ] Qualify database-DDL rename UI and broaden quoted physical-column/host
   coverage. Indexed physical-column find usages and reference-only rename now
   keep same-named schema columns and string literals separate. Both explicitly
@@ -63,6 +67,10 @@ not establish the live editor/connection experience.
 
 ## Implemented and automatically checked
 
+- [x] Verify the owner-authorized upstream race-fix snapshot, including 20 real
+  consumer race executions across both products and all five IDEA/DataGrip lanes.
+  All ordinary, live transport/credential/console, peer-isolation and installed-IDE
+  gates pass against the exact hash-checked candidate. This is not a stable release.
 - [x] Qualify saved-credential integration through Database Tools and a private real
   Password Safe KeePass backend: encrypted reload, source/driver resolution,
   replacement/copy isolation, memory-only exclusion and fresh reader JVMs. Spice

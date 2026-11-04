@@ -6,11 +6,11 @@ qualified release. Earlier exploratory results are in
 [archive/local-baseline-testing.md](archive/local-baseline-testing.md).
 
 The engineering follow-up is recorded in
-[engineering-qualification.md](engineering-qualification.md). Ordinary tests are
-green, but two desired-contract real-helper race tests fail on released support
-0.4.0. The owner has requested an upstream local snapshot candidate; its consumer
-verification and final build are pending. Do not treat the passing totals below
-as a pass of those race contracts.
+[engineering-qualification.md](engineering-qualification.md). The two desired
+contracts still fail on the ordinary released 0.4.0 default, but the exact
+owner-authorized upstream SNAPSHOT now passes the full consumer matrix, including
+20 real race executions. See [candidate-verification.md](candidate-verification.md)
+for exact coordinates/hashes, results, candidate packaging and release boundaries.
 
 ## Standard runtime checks
 
