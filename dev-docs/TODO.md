@@ -34,6 +34,9 @@ not establish the live editor/connection experience.
   on IDEA 261/262/263 and actual DataGrip 261/262. The ordinary default remains
   released 0.4.0; formal release adoption is still a separate gate. See
   candidate-verification.md for exact inputs and qualification evidence.
+  Final clean qualification ZIP `0.1.0-qualification-dev.202611041624+52908a14aabc`
+  passes all five verifier targets and legal/dependency checks. Consumer acceptance
+  was sent upstream. No public/stable library or plugin release is authorized.
 - [ ] Qualify database-DDL rename UI and broaden quoted physical-column/host
   coverage. Indexed physical-column find usages and reference-only rename now
   keep same-named schema columns and string literals separate. Both explicitly

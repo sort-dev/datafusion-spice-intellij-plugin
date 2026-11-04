@@ -60,6 +60,25 @@ Evidence: `ordinary-*`, `final-ordinary-*`, `datagrip-*`, `live/`,
 
 ## Packaging and remaining boundaries
 
+Final clean plugin build from consumer implementation `52908a14aabc`:
+
+`build/dogfood/datafusion-spice-intellij-plugin-0.1.0-qualification-dev.202611041624+52908a14aabc.zip`
+
+SHA-256: `8239c5cdf1da9312a0d0dbe2fca104ff66d87862532438bd3e211e59951fa6ec`.
+
+The exact clean ZIP passed `verifyDistribution` and all five full Plugin Verifier
+targets: DataGrip 261.24374.56 / 262.10315.132 and IDEA 262.10968.63 / 263.4732.28 /
+263.5701.42. Each remains Compatible with 1 internal, 11 experimental and 1
+deprecated usage. No exemptions or publication approval were added.
+
+Independent ZIP inspection requires the two embedded candidate runtime JARs to
+match the supplied publication hashes. Test support and Arrow JDBC are absent;
+the descriptor/version explicitly says qualification. All upstream input hashes
+were rechecked unchanged after qualification. Final log and machine-readable ZIP
+record are `build/candidate-qualification/final-build.log` and
+`final-build-record.json`. Final consumer acceptance was sent to the existing
+Brikk agent; it does not authorize a final/public library release or remote push.
+
 The exact candidate runtime coordinates are included in the qualification-only
 third-party notice section. The legal/dependency gate is not waived. Candidate
 builds use `0.1.0-qualification-dev.*`; release mode rejects snapshot overrides.

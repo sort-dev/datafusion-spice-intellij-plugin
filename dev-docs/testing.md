@@ -279,10 +279,13 @@ installed IntelliJ 2026.2.1 / 262.9437.185. The summaries record the exact clean
 commit and an empty worktree status. Installed-IDE metadata and XML are in
 `build/nap/final-installed-ide.json` and `final-installed-runtime/`.
 
-The 17ad87d ZIP above predates this engineering follow-up. The new candidate will
-only be built after the authorized upstream snapshot passes the failed race
-contracts. Candidate versions use `0.1.0-qualification-dev.*`, never a relabeled
-stable release. See engineering-qualification.md for the snapshot gate.
+The 17ad87d ZIP above predates this engineering follow-up. The verified candidate
+ZIP is now `datafusion-spice-intellij-plugin-0.1.0-qualification-dev.202611041624+52908a14aabc.zip`,
+SHA-256 `8239c5cdf1da9312a0d0dbe2fca104ff66d87862532438bd3e211e59951fa6ec`.
+It embeds the exact authorized local snapshot, passes all five verifier targets
+and distribution checks, and is not a stable/public release. See
+candidate-verification.md for provenance, all passing race/matrix results and
+the distinction from the unchanged ordinary 0.4.0 dependency default.
 
 The user's live-window symptoms, driver-dialog upgrades, clean interactive installs,
 production TLS/auth policy, cross-library cache migration and full DataFusion
