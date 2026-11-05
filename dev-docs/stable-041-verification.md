@@ -68,7 +68,12 @@ historical qualification ZIP was not relabeled. Final evidence is
 Stable consumer adoption was acknowledged to the existing Brikk agent. Hosted
 consumer CI is tracked separately at
 https://github.com/sort-dev/datafusion-spice-intellij-plugin/actions/runs/42074662198.
-Its result is pending at this checkpoint.
+The run passed on adoption commit `b4734e4bc399`: both Kotlin modes on all three
+IDEA runtimes, evidence-tool checks, build/distribution gates and artifact upload.
+Downloaded `test-results` artifacts confirm 84 passing tests per runtime per mode,
+504 hosted executions with zero failures/errors/skips. Evidence is under
+`build/stable-041/hosted-test-results/ci/`. The manual-only hosted Plugin Verifier
+job was skipped; all five verifier verdicts above are from the separate local run.
 
 Live-window cold references/schema selection, interactive installs/driver
 upgrades, OS-keychain UI, unload/disposal and noncooperative RPC/cleanup remain

@@ -67,6 +67,9 @@ not establish the live editor/connection experience.
   12 peer checks, 84 installed-IDE tests, nine Python tests and all five verifier
   targets. No candidate override or Maven Local release dependency is needed.
   Plugin tags, releases and Marketplace publication remain unauthorized.
+  Hosted CI 42074662198 passed on b4734e4; downloaded evidence confirms both
+  Kotlin modes and 84 tests on each IDEA runtime. Hosted verifier was skipped;
+  the five full compatible verdicts come from the separate local audit.
 - [x] Verify the owner-authorized upstream race-fix snapshot, including 20 real
   consumer race executions across both products and all five IDEA/DataGrip lanes.
   All ordinary, live transport/credential/console, peer-isolation and installed-IDE
