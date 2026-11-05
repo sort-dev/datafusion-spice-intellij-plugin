@@ -49,8 +49,26 @@ checked summaries are under `build/stable-041/ordinary-*`, `datagrip-*`, `live/`
 public hashes and select only 0.4.1 support plus released SQL 0.23.0, without
 Maven Local. `*-resolved.json` records each inspected runtime classpath.
 
-A fresh clean normal `0.1.0-dev.*` ZIP is built after committing this tested
-adoption. The historical qualification ZIP is not relabeled.
+## Fresh clean dogfood ZIP
+
+Built from pushed adoption commit `b4734e4bc399ae3d2305886f8e00fa72c58a3022`,
+with a clean checkout and no candidate override:
+
+`build/dogfood/datafusion-spice-intellij-plugin-0.1.0-dev.202611051726+b4734e4bc399.zip`
+
+SHA-256: `a4a96d9069aa226be664bd8fcffe68e570947e763509e5fad765c5971c570613`.
+
+This fresh normal ZIP passed all five full verifier targets and distribution
+checks. Independent inspection confirms its descriptor/version, exact six-JAR
+payload, released SQL 0.23.0, public support/JDBC 0.4.1 hashes and packaged legal
+notices. Test support, Arrow JDBC, old support and snapshot JARs are absent. The
+historical qualification ZIP was not relabeled. Final evidence is
+`build/stable-041/final-build.log` and `final-build-record.json`.
+
+Stable consumer adoption was acknowledged to the existing Brikk agent. Hosted
+consumer CI is tracked separately at
+https://github.com/sort-dev/datafusion-spice-intellij-plugin/actions/runs/42074662198.
+Its result is pending at this checkpoint.
 
 Live-window cold references/schema selection, interactive installs/driver
 upgrades, OS-keychain UI, unload/disposal and noncooperative RPC/cleanup remain

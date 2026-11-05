@@ -14,6 +14,12 @@ evidence remains in [candidate-verification.md](candidate-verification.md).
 
 ## Standard runtime checks
 
+The current clean dogfood ZIP uses released support 0.4.1:
+`build/dogfood/datafusion-spice-intellij-plugin-0.1.0-dev.202611051726+b4734e4bc399.zip`.
+SHA-256: `a4a96d9069aa226be664bd8fcffe68e570947e763509e5fad765c5971c570613`.
+It passed the full stable-default matrix and all five local verifier targets.
+See stable-041-verification.md for exact evidence and remaining approval gaps.
+
 Build JDK 21.0.2, Gradle 9.0.0, Kotlin 2.4.10, SQL 0.23.0 and IntelliJ
 support/JDBC/test support 0.4.1. Tests use each IDE's bundled runtime.
 
