@@ -6,12 +6,14 @@ Sortdev SRL, from https://github.com/brikk/brikk-sql:
 - `brikk-sql-jvm:0.23.0`
 - `brikk-sql-metadata-jvm:0.23.0`
 - `brikk-sql-verify-api:0.23.0`
-- `brikk-sql-intellij-support:0.4.0`
-- `brikk-sql-intellij-jdbc-support:0.4.0`
+- `brikk-sql-intellij-support:0.4.1`
+- `brikk-sql-intellij-jdbc-support:0.4.1`
 
-## Owner-authorized local qualification candidate
+## Historical owner-authorized local qualification candidate
 
-Ordinary builds use the released coordinates above. Only when the explicit
+Ordinary builds use released 0.4.1 above. The accepted pre-release qualification
+used the coordinates below, retained here for its archived ZIP and explicit
+snapshot override. Only when the explicit
 qualification override is supplied, the two IntelliJ runtime artifacts are
 replaced with the following Apache License 2.0 local SNAPSHOT publications,
 Copyright Brikk / Sortdev SRL:

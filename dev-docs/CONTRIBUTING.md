@@ -2,7 +2,7 @@
 
 The build follows the sibling sort-dev SQL plugins: Gradle 9.0.0, vendored
 `dev.sort.sql-dialect-plugin` conventions, Kotlin 2.4.10 and Java 21 bytecode.
-SQL 0.23.0 and IntelliJ support 0.4.0 resolve from Maven Central.
+SQL 0.23.0 and IntelliJ support 0.4.1 resolve from Maven Central.
 `mise.toml` pins Java 21.0.2 as DuckDB and Doris do. Use that JDK as JAVA_HOME;
 with mise, trust this local project configuration and use `mise exec -- ./gradlew`.
 

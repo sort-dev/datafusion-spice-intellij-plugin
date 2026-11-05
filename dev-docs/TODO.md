@@ -23,20 +23,10 @@ not establish the live editor/connection experience.
   separately from active-stream cancellation. Active streamed-row cancel and
   same-connection recovery have a bounded disposable-process lane. A driver that
   ignores cancel or blocks inside cancel/close is not covered by that result.
-- [ ] Consume a reviewed released Brikk fix for two confirmed 0.4.0 lifecycle
-  failures: an in-flight harvest can recreate forgotten metadata, and an older
-  same-identity helper can overwrite a newer completed refresh. Desired-contract
-  reproducers fail on real helpers for both products. Do not hide them with a
-  second consumer cache/generation manager or a locally patched library. Broader
-  reconnect/disposal ordering remains a related qualification gate. See
-  engineering-qualification.md for commands and ownership.
-  The owner-authorized upstream snapshot now passes both real consumer contracts
-  on IDEA 261/262/263 and actual DataGrip 261/262. The ordinary default remains
-  released 0.4.0; formal release adoption is still a separate gate. See
-  candidate-verification.md for exact inputs and qualification evidence.
-  Final clean qualification ZIP `0.1.0-qualification-dev.202611041624+52908a14aabc`
-  passes all five verifier targets and legal/dependency checks. Consumer acceptance
-  was sent upstream. No public/stable library or plugin release is authorized.
+- [ ] Qualify broader reconnect/disposal ordering beyond the two fixed catalog
+  races. Released Brikk 0.4.1 now passes both desired contracts on real helpers
+  across IDEA 261/262/263 and DataGrip 261/262. No second consumer cache/generation
+  manager or locally patched library was added. See stable-041-verification.md.
 - [ ] Qualify database-DDL rename UI and broaden quoted physical-column/host
   coverage. Indexed physical-column find usages and reference-only rename now
   keep same-named schema columns and string literals separate. Both explicitly
@@ -70,6 +60,13 @@ not establish the live editor/connection experience.
 
 ## Implemented and automatically checked
 
+- [x] Adopt public Maven Central IntelliJ common/JDBC/test support 0.4.1, keeping
+  SQL core/metadata/verification API on 0.23.0. Public binaries/sources match the
+  accepted snapshot. Fresh stable-default qualification passes 504 IDEA and 168
+  DataGrip ordinary executions, 328 live checks including all 20 race executions,
+  12 peer checks, 84 installed-IDE tests, nine Python tests and all five verifier
+  targets. No candidate override or Maven Local release dependency is needed.
+  Plugin tags, releases and Marketplace publication remain unauthorized.
 - [x] Verify the owner-authorized upstream race-fix snapshot, including 20 real
   consumer race executions across both products and all five IDEA/DataGrip lanes.
   All ordinary, live transport/credential/console, peer-isolation and installed-IDE

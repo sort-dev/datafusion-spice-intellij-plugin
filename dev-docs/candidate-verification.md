@@ -1,7 +1,9 @@
 # Local Brikk race-fix candidate verification
 
-This is an owner-authorized Maven Local SNAPSHOT qualification, not a stable or
-public release. The ordinary dependency default remains released 0.4.0.
+This records the historical owner-authorized Maven Local SNAPSHOT qualification,
+not a stable or public release. The ordinary default has since moved to public
+0.4.1. See [stable-041-verification.md](stable-041-verification.md). Statements below
+about the unchanged 0.4.0 default describe the snapshot acceptance checkpoint.
 
 ## Exact input
 

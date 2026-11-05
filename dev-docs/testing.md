@@ -6,16 +6,16 @@ qualified release. Earlier exploratory results are in
 [archive/local-baseline-testing.md](archive/local-baseline-testing.md).
 
 The engineering follow-up is recorded in
-[engineering-qualification.md](engineering-qualification.md). The two desired
-contracts still fail on the ordinary released 0.4.0 default, but the exact
-owner-authorized upstream SNAPSHOT now passes the full consumer matrix, including
-20 real race executions. See [candidate-verification.md](candidate-verification.md)
-for exact coordinates/hashes, results, candidate packaging and release boundaries.
+[engineering-qualification.md](engineering-qualification.md). The ordinary default
+now uses public IntelliJ support 0.4.1, whose binaries and sources match the
+accepted race-fix snapshot. Stable consumer requalification is recorded in
+[stable-041-verification.md](stable-041-verification.md). The earlier snapshot
+evidence remains in [candidate-verification.md](candidate-verification.md).
 
 ## Standard runtime checks
 
 Build JDK 21.0.2, Gradle 9.0.0, Kotlin 2.4.10, SQL 0.23.0 and IntelliJ
-support/JDBC/test support 0.4.0. Tests use each IDE's bundled runtime.
+support/JDBC/test support 0.4.1. Tests use each IDE's bundled runtime.
 
 ```sh
 ./gradlew test test262 test263 buildPlugin verifyDistribution
@@ -285,7 +285,8 @@ SHA-256 `8239c5cdf1da9312a0d0dbe2fca104ff66d87862532438bd3e211e59951fa6ec`.
 It embeds the exact authorized local snapshot, passes all five verifier targets
 and distribution checks, and is not a stable/public release. See
 candidate-verification.md for provenance, all passing race/matrix results and
-the distinction from the unchanged ordinary 0.4.0 dependency default.
+the historical snapshot checkpoint. The ordinary default now consumes public
+0.4.1; stable-041-verification.md records its separate rebuild and qualification.
 
 The user's live-window symptoms, driver-dialog upgrades, clean interactive installs,
 production TLS/auth policy, cross-library cache migration and full DataFusion
