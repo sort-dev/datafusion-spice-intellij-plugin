@@ -78,6 +78,11 @@ not establish the live editor/connection experience.
 
 ## Implemented and automatically checked
 
+- [x] Publish the owner-authorized 0.2.0 GitHub release from becd4ce through shared
+  workflow 42255315150. Downloaded release ZIP has SHA-256
+  af512ddef536e684555341ba4e1d52b5377aeb255d0548a7df369ebe2937ee28;
+  descriptor/runtime/public-hash checks pass. Approved public text and checksum
+  are attached. Screenshots remain with the owner; no Marketplace upload.
 - [x] Review API ownership and risk, prepare listing/change-notes/privacy drafts
   and a manual-only pinned shared GitHub-release workflow. No release/tag
   creation, workflow dispatch or Marketplace publication.

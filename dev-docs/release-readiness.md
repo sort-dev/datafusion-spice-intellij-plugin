@@ -1,5 +1,28 @@
 # Release readiness review
 
+## Published 0.2.0
+
+The owner-authorized GitHub release is published:
+https://github.com/sort-dev/datafusion-spice-intellij-plugin/releases/tag/v0.2.0.
+Source/tag commit: `becd4ce3ab9f571567b52a0dcd7e26ea694673a2`.
+The shared release workflow passed:
+https://github.com/sort-dev/datafusion-spice-intellij-plugin/actions/runs/42255315150.
+
+The published `datafusion-spice-intellij-plugin-0.2.0.zip` was downloaded and
+independently checked for descriptor/version, the exact runtime payload and
+public Brikk 0.4.1 hashes. SHA-256:
+`af512ddef536e684555341ba4e1d52b5377aeb255d0548a7df369ebe2937ee28`.
+The checksum file is attached to the release. Public release text is in
+`dev-docs/release/github-0.2.0.md`. Local records are under
+`build/release-020/published/` and `published-record.json`.
+
+Both Kotlin modes passed 84 ordinary tests on each of the three IDEA runtimes,
+504 executions. All five local verifier targets were Compatible; the accepted
+API baseline passed the exact approval check. Captures are left to the owner
+for later. Marketplace upload was not performed. The sample IDE was left open.
+
+## Original preparation record
+
 The owner has now authorized a 0.2.0 GitHub release, including its branch/tag and
 release ZIP. Screenshots will be supplied by the owner afterward and do not
 block this release. Marketplace upload is not part of this authorization.
