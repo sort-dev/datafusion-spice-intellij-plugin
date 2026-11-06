@@ -32,6 +32,11 @@ records into `dev-docs/archive/` only when they actually become obsolete.
 GitHub pushes, releases, Marketplace uploads and internal-API approvals require
 separate owner authorization. A local successful build is not publication approval.
 
+See [release-readiness.md](release-readiness.md) for the exact API review,
+installed-ZIP qualification lane, listing drafts and owner-only release procedure.
+The prepared shared release workflow is manual-only and must not be dispatched
+without separate authorization. Marketplace publication is not part of it.
+
 ## Optional disposable Flight checks
 
 `tools/run-flight-smoke.py` starts and cleans up its own Spice 2.4.0 container and

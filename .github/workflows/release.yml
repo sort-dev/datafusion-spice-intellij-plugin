@@ -1,0 +1,22 @@
+name: Owner-authorized GitHub release
+
+on:
+  workflow_dispatch:
+    inputs:
+      authorization:
+        description: 'Only after separate owner approval: enter publish-github-release'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    if: startsWith(github.ref, 'refs/heads/release/') && inputs.authorization == 'publish-github-release'
+    permissions:
+      contents: write
+    uses: sort-dev/intellij-sql-plugin-gradle-conventions/.github/workflows/release-plugin-zip.yml@a30cc5588f9ba1e40dcaf3e39e7735849f5fe2d2
+    with:
+      plugin-id: dev.sort.datafusion-spice-intellij-plugin
+      title: SQL Dialects for DataFusion & Spice

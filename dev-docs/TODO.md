@@ -6,20 +6,12 @@ not establish the live editor/connection experience.
 
 ## Core gates still open
 
-- [ ] Confirm the reported cold/open-query red references, schema dropdown,
-  default namespace selection and typing-triggered introspection in a live IDE.
-  The missing hooks are implemented and recording-model tests cover no-edit sync;
-  that is not a claim to have driven the user's window.
-  Real remote-process tests also exposed and fixed first-connect version learning
-  invalidating the catalog identity. See remote-driver-qualification.md.
-  Owner confirmed local Spice references/completion, refresh and reconnect on
-  2026-11-06. This does not establish DataFusion or every IDE build, nor explicitly
-  close schema-dropdown/default-namespace coverage. The owner subsequently
-  confirmed saved credentials were restored and correctly sent as username/password;
-  the local server did not enforce authentication.
 - [ ] Exercise clean interactive ZIP installs on 261/262/263, including actual
   driver-process launch, secure credential handling, URL controls, both dialects,
   settings, preview/run UI and disposal/unload behavior.
+  Actual archived snapshot and stable ZIPs now load through private plugin
+  classloaders on all three IDEA runtimes, with exact payload hashes and stale-JAR
+  removal checked. This does not close Plugins-dialog or saved-driver upgrade UI.
 - [ ] Verify driver-settings upgrade behavior interactively. Connection VM fields
   contain additions, not inherited driver values. The user's saved Spice driver
   override had only the old --add-opens value; it must be corrected at driver
@@ -32,6 +24,9 @@ not establish the live editor/connection experience.
   races. Released Brikk 0.4.1 now passes both desired contracts on real helpers
   across IDEA 261/262/263 and DataGrip 261/262. No second consumer cache/generation
   manager or locally patched library was added. See stable-041-verification.md.
+  A strict opt-in headless lifecycle probe passes 261 disable/re-enable but 262
+  and 263 reject dynamic disable. Preserve the failures and decide a restart-required
+  policy or investigate further; do not infer unload safety from verifier eligibility.
 - [ ] Qualify database-DDL rename UI and broaden quoted physical-column/host
   coverage. Indexed physical-column find usages and reference-only rename now
   keep same-named schema columns and string literals separate. Both explicitly
@@ -42,18 +37,23 @@ not establish the live editor/connection experience.
 
 ## Decisions and release gates
 
-- [ ] Review the current API audit before publication: 1 internal factory
+- [ ] Obtain the owner decision on the reviewed API audit: 1 internal factory
   reference, 11 experimental usages and 1 deprecated model-helper override per
   audited IDE. Three experimental references are in ProductHarvest; capturing the
   Project before the EDT handoff removed four unnecessary ProtoConnection usages.
   No exemptions have been granted or copied from peers. Compatible is not approval.
+  Engineering review and ownership are recorded in release-readiness.md; the
+  remaining gate is explicit owner risk acceptance or a reviewed released fix.
 - [ ] Define the advertised DataFusion endpoint/tree contract. The bounded test
   embedding has native information-schema inventories but lacks JDBC table-metadata
   RPCs. Do not promise a full database tree from those facts or invent a local
   native-model writer; a broader tree requirement needs a reviewed shared design.
-- [ ] Prepare the shared reusable release workflow and final listing assets,
-  trademark/licensing review and owner-only upload procedure. Commit/push is now
+- [ ] Finish real listing screenshots and final owner trademark/licensing/privacy
+  review and upload approval. Commit/push is now
   authorized; GitHub releases/tags and Marketplace publication are not.
+  Manual-only pinned shared workflow, listing/change-notes drafts and owner
+  procedure are prepared. Real redacted screenshots and final owner legal/listing
+  approval remain. See release-readiness.md.
 - [ ] Request sixth-plugin adoption in shared staging and reverse peer-isolation
   lists. Do not modify the vendored conventions to hide hardcoded shared lists.
 
@@ -69,11 +69,24 @@ not establish the live editor/connection experience.
   confirmed on 2026-11-06. The owner subsequently confirmed saved-credential
   restoration and correct username/password transmission, without server-side
   authentication enforcement in this fixture. This does not
-  qualify every IDE build, DataFusion, database-DDL rename UI or unload/disposal.
+  qualify every IDE build, database-DDL rename UI or unload/disposal.
   See stable-041-verification.md for fixture details and the observed DDL limits.
+- [x] Owner confirmed DataFusion basic execution, cold-open references, completion,
+  schema selection, refresh, reconnect and PIPE had already been checked. Treat
+  both products' local interactive dogfood checklists as complete, without asking
+  for repeats or inventing an exact IDE build/cross-version UI matrix.
 
 ## Implemented and automatically checked
 
+- [x] Review API ownership and risk, prepare listing/change-notes/privacy drafts
+  and a manual-only pinned shared GitHub-release workflow. No production API
+  exemptions, release/tag creation, workflow dispatch or Marketplace publication.
+  The shared API gate still rejects the unapproved internal factory reference.
+  See release-readiness.md for owner-only steps and outstanding decisions.
+- [x] Load the exact archived snapshot ZIP then the stable ZIP in separate IDE
+  JVMs on 261/262/263, reusing each runtime's disposable installation directory.
+  Thirty private-classloader test executions pass, including full installed JAR
+  name/hash equality and no leftover snapshot JARs after stable replacement.
 - [x] Adopt public Maven Central IntelliJ common/JDBC/test support 0.4.1, keeping
   SQL core/metadata/verification API on 0.23.0. Public binaries/sources match the
   accepted snapshot. Fresh stable-default qualification passes 504 IDEA and 168

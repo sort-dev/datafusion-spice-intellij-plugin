@@ -83,7 +83,10 @@ credentials were initially excluded. The owner subsequently confirmed the
 save/restart/reconnect check and observed correct username/password transmission.
 The local server did not enforce authentication; this confirms credential
 restoration/transmission, not authenticated-server acceptance.
-The exact IDE build was not supplied; this is not an all-build or DataFusion pass.
+The exact IDE build was not supplied; this is not an all-build pass. The owner
+subsequently confirmed DataFusion basic execution, cold-open references,
+completion, schema selection, refresh, reconnect and PIPE had already been
+checked. Both product-level interactive dogfood checklists are complete.
 
 The tested ZIP was
 `build/distributions/dogfood/datafusion-spice-intellij-plugin-0.1.0-dev.202611051736+934d6166c1ee.zip`,
@@ -94,7 +97,8 @@ CREATE SCHEMA/TABLE, INSERT, SELECT and DROP TABLE passed Arrow JDBC checks;
 data survived all service restarts. SQL DROP SCHEMA is unsupported by this
 observed server version. Local setup/evidence is under `build/local-spice/`.
 
-Schema-dropdown/default-namespace coverage, cross-build interactive installs,
-driver upgrades, OS-keychain-specific UI, unload/disposal and
+Cross-build interactive installs, driver upgrades, OS-keychain-specific UI,
+unload/disposal and
 noncooperative RPC/cleanup remain separate qualification gaps. API review and
 publication approval remain open.
+Release/API preparation and its remaining decisions are in release-readiness.md.

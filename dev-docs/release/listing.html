@@ -1,0 +1,23 @@
+<p>Separate Apache DataFusion and Spice SQL dialects for DataGrip and IntelliJ IDEA
+with Database Tools, on IDE builds 261 through 263.</p>
+<ul>
+  <li>Product-specific parsing, highlighting, completion, documentation and local SQL diagnostics.</li>
+  <li>Separate live catalog inventories, explicit refresh and SQL reference navigation.</li>
+  <li>Apache Arrow Flight SQL JDBC connection templates for each product.</li>
+  <li>Independent, off-by-default Brikk PIPE generated-SQL preview and run-to-stage.</li>
+</ul>
+<p>Background native verification is unavailable. The plugin does not execute,
+prepare or EXPLAIN your SQL to validate the editor. Connection and database-tree
+behavior depend on the installed JDBC driver and server. DataFusion deployments
+must expose the required Flight SQL and information-schema contract.</p>
+<p>Reading the current namespace and selecting schemas for introspection are
+supported. Generated console namespace switching is not supported. SQL DDL
+requires a supporting server catalog and permissions; the plugin does not enable
+server write access.</p>
+<p>Bundled metadata targets DataFusion 55.2.0 and Spice 2.4.0. Other versions use
+labeled fallback metadata rather than an exact-version support claim. See the
+<a href="https://github.com/sort-dev/datafusion-spice-intellij-plugin#readme">README</a>
+for setup and version-specific upstream limitations.</p>
+<p>Developed by Sortdev SRL under the Apache License 2.0. This independent plugin
+is not affiliated with or endorsed by the Apache Software Foundation, Apache
+DataFusion, Apache Arrow or Spice.ai.</p>

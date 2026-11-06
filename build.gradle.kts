@@ -1,3 +1,5 @@
+import java.util.zip.ZipFile
+
 plugins {
     id("dev.sort.sql-dialect-plugin")
 }
@@ -5,7 +7,8 @@ plugins {
 group = "dev.sort.datafusionspice"
 val supportCandidate = providers.gradleProperty("qualification.brikkSupportVersion")
     .orElse(providers.environmentVariable("BRIKK_SUPPORT_CANDIDATE"))
-version = if (supportCandidate.isPresent) "0.1.0-qualification" else "0.1.0"
+version = "0.1.0"
+if (supportCandidate.isPresent) version = "$version-qualification"
 
 sqlDialectPlugin {
     kotlinTests = false
@@ -100,5 +103,46 @@ providers.gradleProperty("test.dataGripIde").orNull?.let { installation ->
                 })
             }
         }
+    }
+}
+
+// Install the exact archived payload in a separate sandbox, not the current
+// compiled product. Run through the shared private-classloader isolation lane.
+val installedPluginZip = providers.gradleProperty("test.installedPluginZip")
+require(providers.gradleProperty("test.dynamicPluginLifecycle").orNull != "true" || installedPluginZip.isPresent) {
+    "Dynamic plugin lifecycle qualification requires -Ptest.installedPluginZip=<zip>"
+}
+installedPluginZip.orNull?.let { archive ->
+    require(providers.gradleProperty("test.pluginIsolation").orNull == "true") {
+        "Installed-ZIP qualification requires -Ptest.pluginIsolation=true"
+    }
+    val input = file(archive)
+    require(input.isFile) { "Missing installed plugin ZIP: $input" }
+    val root = "datafusion-spice-intellij-plugin"
+    val entries = ZipFile(input).use { zip ->
+        zip.entries().asSequence().filter { !it.isDirectory }.map { it.name }.toList()
+    }
+    require(entries.all { it.startsWith("$root/") && ".." !in it.split('/') }) {
+        "Installed plugin ZIP must contain only the expected plugin directory"
+    }
+    val mainJar = entries.single { it.startsWith("$root/lib/$root-") && it.endsWith(".jar") }
+    val libraries = entries.filter { it.endsWith(".jar") && it != mainJar }
+    val extracted = layout.buildDirectory.dir("installed-zip-payload")
+    val extract = tasks.register<Sync>("extractInstalledPluginZip") {
+        from(zipTree(input))
+        into(extracted)
+    }
+    tasks.withType<org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask>().configureEach {
+        if (name == "prepareTestSandbox" || name.startsWith("prepareSandbox_test")) {
+            dependsOn(extract)
+            sandboxSuffix.set("-test-installed-zip-$name")
+            pluginJar.set(extracted.map { it.file(mainJar) })
+            runtimeClasspath.setFrom(libraries.map { path -> extracted.map { it.file(path) } })
+        }
+    }
+    tasks.withType<Test>().configureEach {
+        systemProperty("test.installedPluginZip", input.absolutePath)
+        systemProperty("test.dynamicPluginLifecycle",
+            providers.gradleProperty("test.dynamicPluginLifecycle").orNull == "true")
     }
 }
