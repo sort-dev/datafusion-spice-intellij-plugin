@@ -1,2 +1,3 @@
-# No internal API exemptions have been approved for this plugin.
-# Do not copy approvals from sibling plugins.
+# Owner accepted the existing API usages during release review.
+# Reopen review only for new or changed usages, not this accepted baseline.
+Internal interface com.intellij.database.introspection.DBIntrospector.Factory is referenced in dev.brikk.house.sql.intellij.catalog.GenericJdbcIntrospectorGate.

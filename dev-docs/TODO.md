@@ -25,8 +25,9 @@ not establish the live editor/connection experience.
   across IDEA 261/262/263 and DataGrip 261/262. No second consumer cache/generation
   manager or locally patched library was added. See stable-041-verification.md.
   A strict opt-in headless lifecycle probe passes 261 disable/re-enable but 262
-  and 263 reject dynamic disable. Preserve the failures and decide a restart-required
-  policy or investigate further; do not infer unload safety from verifier eligibility.
+  and 263 reject dynamic disable. The owner accepted this limitation and deferred
+  further checking to normal use. It is not a release blocker. Preserve the
+  evidence and do not advertise restart-free plugin changes.
 - [ ] Qualify database-DDL rename UI and broaden quoted physical-column/host
   coverage. Indexed physical-column find usages and reference-only rename now
   keep same-named schema columns and string literals separate. Both explicitly
@@ -37,13 +38,13 @@ not establish the live editor/connection experience.
 
 ## Decisions and release gates
 
-- [ ] Obtain the owner decision on the reviewed API audit: 1 internal factory
+- [x] Owner accepted the existing API usages: 1 internal factory
   reference, 11 experimental usages and 1 deprecated model-helper override per
   audited IDE. Three experimental references are in ProductHarvest; capturing the
   Project before the EDT handoff removed four unnecessary ProtoConnection usages.
-  No exemptions have been granted or copied from peers. Compatible is not approval.
-  Engineering review and ownership are recorded in release-readiness.md; the
-  remaining gate is explicit owner risk acceptance or a reviewed released fix.
+  The exact internal reference is recorded in api-usage-approvals.txt from this
+  plugin's own report, not copied from a peer. Do not reopen this decision unless
+  new or changed usages appear. See release-readiness.md.
 - [ ] Define the advertised DataFusion endpoint/tree contract. The bounded test
   embedding has native information-schema inventories but lacks JDBC table-metadata
   RPCs. Do not promise a full database tree from those facts or invent a local
@@ -79,9 +80,10 @@ not establish the live editor/connection experience.
 ## Implemented and automatically checked
 
 - [x] Review API ownership and risk, prepare listing/change-notes/privacy drafts
-  and a manual-only pinned shared GitHub-release workflow. No production API
-  exemptions, release/tag creation, workflow dispatch or Marketplace publication.
-  The shared API gate still rejects the unapproved internal factory reference.
+  and a manual-only pinned shared GitHub-release workflow. No release/tag
+  creation, workflow dispatch or Marketplace publication.
+  The owner subsequently accepted the existing API usages; the exact internal
+  reference is now approved without broad package exemptions.
   See release-readiness.md for owner-only steps and outstanding decisions.
 - [x] Load the exact archived snapshot ZIP then the stable ZIP in separate IDE
   JVMs on 261/262/263, reusing each runtime's disposable installation directory.

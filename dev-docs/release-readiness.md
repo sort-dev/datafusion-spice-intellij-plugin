@@ -8,6 +8,12 @@ confirmed; its local server did not enforce authentication.
 
 ## API review
 
+Owner decision: the existing usages are accepted, consistent with the sibling
+plugins. Do not request another decision on this baseline unless new or changed
+usages appear. The exact internal reference from this plugin's report is recorded
+in `api-usage-approvals.txt`; no sibling file or broad package exemption was copied.
+The risk discussion below records the original review, not an outstanding request.
+
 The released support 0.4.1 ZIP has the same findings on all five configured full
 verifier targets. Exact findings and report hashes are in
 `build/release-review/api-audit.json`, generated with:
@@ -20,16 +26,14 @@ python3 tools/audit-release-readiness.py \
 
 | Finding | Count per target | Owner and assessment |
 | --- | --- | --- |
-| Internal `DBIntrospector.Factory` reference in `GenericJdbcIntrospectorGate` | 1 | Released Brikk JDBC support. The gate vetoes PostgreSQL native introspection inherited through extension fallback, selecting generic JDBC instead. Removing it could send PostgreSQL catalog queries to either engine. No exemption granted. |
+| Internal `DBIntrospector.Factory` reference in `GenericJdbcIntrospectorGate` | 1 | Released Brikk JDBC support. The gate vetoes PostgreSQL native introspection inherited through extension fallback, selecting generic JDBC instead. Removing it could send PostgreSQL catalog queries to either engine. Owner accepted this exact reference. |
 | Experimental `DatabaseConnectionInterceptor` / `ProtoConnection` usages | 8 | Released Brikk support. These implement connection harvesting and helper exclusion. Keep per-IDE real connection regression coverage. |
 | Experimental `ProtoConnection` usages in `ProductHarvest` | 3 | This plugin. Two signature references and one `getProject()` call. The method captures the project before the EDT handoff and pins identity around harvest/readback. Removing it loses tested first-connect scope behavior. Retain only with explicit risk acceptance or a reviewed replacement. |
 | Deprecated `ModelHelper.getJdbcType(BasicTypedElement)` override | 1 | Released Brikk support, `PgFamilyCatalogModelHelper`. Still resolves on the supported targets. An upstream replacement is preferable to changing the consumer's model contract. |
 
-The engineering recommendation is to retain the tested connection behavior for
-now, keep the internal reference as an explicit owner decision, and require a
-fresh full verifier audit for every supported SDK update. This recommendation
-does not approve an exemption. No sibling approval files or internal-API package
-allowlists were copied. No shared/vendored code was edited.
+Retain the tested connection behavior. Routine verifier checks should detect
+new or changed usages, not reopen the already accepted ones. No sibling approval
+files or internal-API package allowlists were copied. No shared/vendored code was edited.
 
 The published JDBC-support source explicitly documents the absence of a public
 factory replacement and why a saved "Use JDBC-based introspector" flag is not a
@@ -38,10 +42,10 @@ needs an upstream adapter review and released dependency, not copied SQL or
 platform implementation code. The published sources used for this inspection
 are retained under `build/release-review/upstream-sources/`.
 
-`tools/audit-release-readiness.py --require-api-clean` intentionally fails while
-the internal/experimental usages remain. The shared release workflow independently
-checks exact owner-approved internal call sites. Without an owner approval file,
-the current internal finding blocks that workflow.
+`tools/audit-release-readiness.py --require-api-clean` is a zero-usage diagnostic,
+not a release requirement for the accepted baseline. Its historical report does
+not grant approval itself. The shared release workflow checks the exact owner
+approval file and still rejects additional internal references.
 
 ## Installation, upgrade and unload coverage
 
@@ -100,10 +104,10 @@ Earlier test-driver API mismatches remain in the historical failed archives.
 The final harness calls the common single-argument enable/disable entry points,
 not SDK-version-specific overloads. No result is converted to an expected skip.
 
-Recommended current policy: do not advertise restart-free disable/update. Keep
-restart-based installation available and require owner acceptance of that
-limitation or complete the investigation before publication. No descriptor
-restart policy was changed without that decision.
+Owner decision: accept this limitation and defer further checking to normal use.
+Do not advertise restart-free disable/update. These headless results are retained,
+but further investigation is not a release blocker. No descriptor restart policy
+was changed as part of this decision.
 
 Pending interactive matrix, in disposable IDE profiles rather than saved user settings:
 
@@ -149,8 +153,8 @@ authorization granted by this review.
 
 Before a separately authorized release:
 
-1. Finish the API decision and install/unload matrix. An exact internal-API approval
-   may only be added with explicit owner authorization; never import one from a peer.
+1. Preserve the accepted API baseline and deferred restart-free behavior. Reopen
+   API review only if new usages appear; never import approvals from a peer.
 2. Choose the release version and update the single literal `version = "..."` in
    `build.gradle.kts`. Candidate labeling remains a separate guarded adjustment.
    Account for JetBrains ordering a same-base `-dev` build after the bare version;

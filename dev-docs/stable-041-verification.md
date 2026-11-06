@@ -99,6 +99,8 @@ observed server version. Local setup/evidence is under `build/local-spice/`.
 
 Cross-build interactive installs, driver upgrades, OS-keychain-specific UI,
 unload/disposal and
-noncooperative RPC/cleanup remain separate qualification gaps. API review and
-publication approval remain open.
+noncooperative RPC/cleanup remain recorded gaps. The owner accepted the existing
+API usages and deferred restart-free disable/update checking to normal use.
+Do not reopen those accepted decisions without new evidence. Publication still
+requires separate authorization.
 Release/API preparation and its remaining decisions are in release-readiness.md.
