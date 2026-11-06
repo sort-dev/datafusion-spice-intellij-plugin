@@ -180,3 +180,12 @@ and actionlint with shellcheck pass. Logs and immutable ordinary XML are under
 `build/release-review/`; `final-api-audit.json` records the fresh verifier audit.
 These green results do not override the separately retained dynamic-lifecycle
 failures or grant publication approval.
+
+Hosted CI passed on preparation commit `d8df30a05a519410175fb090496a499bfb63b016`:
+https://github.com/sort-dev/datafusion-spice-intellij-plugin/actions/runs/42247149493.
+Downloaded artifacts confirm 84 passing ordinary tests per runtime in both Kotlin
+modes, 504 executions. Evidence-tool tests, distribution checks and artifact
+uploads passed. Hosted verifier was skipped; the five verifier results above
+are local. This CI run does not execute the opt-in dynamic lifecycle probe and
+does not supersede its retained 262/263 failures. Downloaded XML/summaries are
+under `build/release-review/hosted-test-results/`.
