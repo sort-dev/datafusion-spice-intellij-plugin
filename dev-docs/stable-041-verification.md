@@ -79,7 +79,10 @@ job was skipped; all five verifier verdicts above are from the separate local ru
 
 On 2026-11-06 the owner confirmed DDL dogfooding and the remaining listed local
 Spice checks: editor references/completion, refresh and reconnect. Saved
-credentials were explicitly excluded and remain a manual qualification gap.
+credentials were initially excluded. The owner subsequently confirmed the
+save/restart/reconnect check and observed correct username/password transmission.
+The local server did not enforce authentication; this confirms credential
+restoration/transmission, not authenticated-server acceptance.
 The exact IDE build was not supplied; this is not an all-build or DataFusion pass.
 
 The tested ZIP was
@@ -92,6 +95,6 @@ data survived all service restarts. SQL DROP SCHEMA is unsupported by this
 observed server version. Local setup/evidence is under `build/local-spice/`.
 
 Schema-dropdown/default-namespace coverage, cross-build interactive installs,
-driver upgrades, saved credentials/OS-keychain UI, unload/disposal and
+driver upgrades, OS-keychain-specific UI, unload/disposal and
 noncooperative RPC/cleanup remain separate qualification gaps. API review and
 publication approval remain open.

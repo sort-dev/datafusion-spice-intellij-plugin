@@ -14,8 +14,9 @@ not establish the live editor/connection experience.
   invalidating the catalog identity. See remote-driver-qualification.md.
   Owner confirmed local Spice references/completion, refresh and reconnect on
   2026-11-06. This does not establish DataFusion or every IDE build, nor explicitly
-  close schema-dropdown/default-namespace coverage. Saved credentials were
-  explicitly excluded from the owner's pass.
+  close schema-dropdown/default-namespace coverage. The owner subsequently
+  confirmed saved credentials were restored and correctly sent as username/password;
+  the local server did not enforce authentication.
 - [ ] Exercise clean interactive ZIP installs on 261/262/263, including actual
   driver-process launch, secure credential handling, URL controls, both dialects,
   settings, preview/run UI and disposal/unload behavior.
@@ -65,7 +66,9 @@ not establish the live editor/connection experience.
 ## Owner-confirmed local dogfood
 
 - [x] Local Spice DDL, editor references/completion, refresh and reconnect,
-  confirmed on 2026-11-06. Saved credentials explicitly excluded. This does not
+  confirmed on 2026-11-06. The owner subsequently confirmed saved-credential
+  restoration and correct username/password transmission, without server-side
+  authentication enforcement in this fixture. This does not
   qualify every IDE build, DataFusion, database-DDL rename UI or unload/disposal.
   See stable-041-verification.md for fixture details and the observed DDL limits.
 
