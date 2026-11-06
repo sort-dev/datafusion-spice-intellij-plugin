@@ -3,8 +3,8 @@
     <name>SQL Dialects for DataFusion &amp; Spice</name>
     <vendor url="https://sort.dev" email="jayson@sort.dev">Sortdev SRL</vendor>
     <description><![CDATA[
-        <p>Separate Apache DataFusion and Spice SQL dialects for DataGrip and IntelliJ IDEA
-        with Database Tools, on IDE builds 261 through 263.</p>
+        <p>Write DataFusion and Spice SQL with completion, navigation and local error checking
+        in DataGrip and IntelliJ IDEA with Database Tools, on IDE builds 261 through 263.</p>
         <ul>
             <li>Product-specific parsing, highlighting, completion, documentation and local diagnostics.</li>
             <li>Independent live catalog inventories and explicit catalog refresh actions.</li>
@@ -17,7 +17,16 @@
         <p>This independent Sortdev SRL plugin is not affiliated with or endorsed by the
         Apache Software Foundation, Apache DataFusion, Apache Arrow or Spice.ai.</p>
     ]]></description>
-    <change-notes><![CDATA[<p>Initial local development build with separate DataFusion and Spice identities.</p>]]></change-notes>
+    <change-notes><![CDATA[
+        <p>0.2.0: first public release.</p>
+        <ul>
+            <li>Separate DataFusion and Spice SQL dialects and Flight SQL connection templates.</li>
+            <li>SQL completion, local diagnostics, reference navigation and catalog refresh.</li>
+            <li>Independent, off-by-default Brikk PIPE preview and run-to-stage.</li>
+        </ul>
+        <p>Background native verification and generated namespace switching are unavailable.
+        Database capabilities and DDL depend on your server and catalog configuration.</p>
+    ]]></change-notes>
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.database</depends>
     <xi:include href="/META-INF/datafusion-spice-pipes.xml" xpointer="xpointer(/idea-plugin/*)"/>

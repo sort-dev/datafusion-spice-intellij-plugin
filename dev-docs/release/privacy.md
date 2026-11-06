@@ -1,6 +1,4 @@
-# Privacy notice draft
-
-Owner review is required before using this text in a public listing.
+# Privacy notice
 
 SQL Dialects for DataFusion & Spice runs inside the JetBrains IDE. Editor SQL
 diagnostics are local; the plugin does not execute, prepare or EXPLAIN your SQL

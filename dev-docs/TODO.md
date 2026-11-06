@@ -50,11 +50,10 @@ not establish the live editor/connection experience.
   RPCs. Do not promise a full database tree from those facts or invent a local
   native-model writer; a broader tree requirement needs a reviewed shared design.
 - [ ] Finish real listing screenshots and final owner trademark/licensing/privacy
-  review and upload approval. Commit/push is now
-  authorized; GitHub releases/tags and Marketplace publication are not.
-  Manual-only pinned shared workflow, listing/change-notes drafts and owner
-  procedure are prepared. Real redacted screenshots and final owner legal/listing
-  approval remain. See release-readiness.md.
+  review and Marketplace upload approval. The owner approved the listing/text plan
+  and authorized the 0.2.0 GitHub release. The owner will supply screenshots later;
+  they are not a release blocker. Marketplace upload remains separate.
+  See release-readiness.md.
 - [ ] Request sixth-plugin adoption in shared staging and reverse peer-isolation
   lists. Do not modify the vendored conventions to hide hardcoded shared lists.
 

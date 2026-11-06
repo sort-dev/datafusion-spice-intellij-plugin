@@ -1,6 +1,9 @@
 # Release readiness review
 
-This is preparation, not approval to tag, release or publish. The owner has
+The owner has now authorized a 0.2.0 GitHub release, including its branch/tag and
+release ZIP. Screenshots will be supplied by the owner afterward and do not
+block this release. Marketplace upload is not part of this authorization.
+The original preparation record below is retained for context. The owner has
 confirmed interactive dogfooding for both DataFusion and Spice. Exact IDE builds
 were not supplied, so that confirmation is not a cross-build install/unload matrix.
 Spice saved-credential restoration and username/password transmission were also
@@ -159,8 +162,7 @@ Before a separately authorized release:
    `build.gradle.kts`. Candidate labeling remains a separate guarded adjustment.
    Account for JetBrains ordering a same-base `-dev` build after the bare version;
   the current 0.1.0 dogfood must not silently prevent users receiving a release.
-  A 0.1.1 first public version would supersede the current 0.1.0-dev builds;
-  that is the recommended versioning choice, not a version change made here.
+  The owner selected 0.2.0 to supersede the existing 0.1.0-dev builds.
 3. Replace the development change notes in plugin.xml with the approved notes,
    then merge the prepared release commit into main after the full verification.
 4. Only with explicit authorization, create `release/<version>` at that exact
