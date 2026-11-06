@@ -75,6 +75,23 @@ Downloaded `test-results` artifacts confirm 84 passing tests per runtime per mod
 `build/stable-041/hosted-test-results/ci/`. The manual-only hosted Plugin Verifier
 job was skipped; all five verifier verdicts above are from the separate local run.
 
-Live-window cold references/schema selection, interactive installs/driver
-upgrades, OS-keychain UI, unload/disposal and noncooperative RPC/cleanup remain
-separate qualification gaps. API review and publication approval remain open.
+## Owner Spice dogfood confirmation
+
+On 2026-11-06 the owner confirmed DDL dogfooding and the remaining listed local
+Spice checks: editor references/completion, refresh and reconnect. Saved
+credentials were explicitly excluded and remain a manual qualification gap.
+The exact IDE build was not supplied; this is not an all-build or DataFusion pass.
+
+The tested ZIP was
+`build/distributions/dogfood/datafusion-spice-intellij-plugin-0.1.0-dev.202611051736+934d6166c1ee.zip`,
+SHA-256 `3e9e5f44ef1bc360afbc4ee760a3896cf1e3a93652d80e70799c2dfd5cb11a5d`.
+The Spice 2.4.0 fixture now has a separate Iceberg-backed `dogfood` catalog with
+`read_write_create`, preserving the original `spice.public.sample` view and ports.
+CREATE SCHEMA/TABLE, INSERT, SELECT and DROP TABLE passed Arrow JDBC checks;
+data survived all service restarts. SQL DROP SCHEMA is unsupported by this
+observed server version. Local setup/evidence is under `build/local-spice/`.
+
+Schema-dropdown/default-namespace coverage, cross-build interactive installs,
+driver upgrades, saved credentials/OS-keychain UI, unload/disposal and
+noncooperative RPC/cleanup remain separate qualification gaps. API review and
+publication approval remain open.

@@ -12,6 +12,10 @@ not establish the live editor/connection experience.
   that is not a claim to have driven the user's window.
   Real remote-process tests also exposed and fixed first-connect version learning
   invalidating the catalog identity. See remote-driver-qualification.md.
+  Owner confirmed local Spice references/completion, refresh and reconnect on
+  2026-11-06. This does not establish DataFusion or every IDE build, nor explicitly
+  close schema-dropdown/default-namespace coverage. Saved credentials were
+  explicitly excluded from the owner's pass.
 - [ ] Exercise clean interactive ZIP installs on 261/262/263, including actual
   driver-process launch, secure credential handling, URL controls, both dialects,
   settings, preview/run UI and disposal/unload behavior.
@@ -57,6 +61,13 @@ not establish the live editor/connection experience.
 - [ ] Automatic Brikk Kotlin-host and SQL Transpiler .bsql integration. No Kotlin
   helper or custom host recognition is currently shipped. Ordinary explicit SQL
   injection is a separate, narrower feature.
+
+## Owner-confirmed local dogfood
+
+- [x] Local Spice DDL, editor references/completion, refresh and reconnect,
+  confirmed on 2026-11-06. Saved credentials explicitly excluded. This does not
+  qualify every IDE build, DataFusion, database-DDL rename UI or unload/disposal.
+  See stable-041-verification.md for fixture details and the observed DDL limits.
 
 ## Implemented and automatically checked
 
