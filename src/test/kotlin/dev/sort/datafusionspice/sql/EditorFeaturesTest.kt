@@ -1,6 +1,7 @@
 package dev.sort.datafusionspice.sql
 
 import com.intellij.codeInsight.CodeInsightSettings
+import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.lang.LanguageParserDefinitions
 import com.intellij.lang.LanguageDocumentation
 import com.intellij.lang.injection.InjectedLanguageManager
@@ -51,6 +52,18 @@ class EditorFeaturesTest : PluginPlatformTestCase() {
             assertEmpty(PsiTreeUtil.findChildrenOfType(myFixture.file, PsiErrorElement::class.java))
             assertSame(dialect, myFixture.file.language)
         }
+    }
+
+    fun testDatafusionBrikkDiagnosticsKeepNumberBeforeEndAndValuesAliasBeforeNestedJoin() {
+        // The inherited PostgreSQL lexer still reports 13END as bad characters; see dev-docs/TODO.md.
+        open("SELECT CASE WHEN true THEN 13END", DatafusionSqlDialect)
+        val brikk = myFixture.doHighlighting().mapNotNull { it.description }.filter { it.contains("brikk-sql") }
+        assertTrue(brikk.toString(), brikk.isEmpty())
+
+        open("SELECT * FROM (VALUES (1)) t1(a) LEFT JOIN (VALUES (1)) t2(b) JOIN (VALUES (1)) t3(c) ON true ON true", DatafusionSqlDialect)
+        assertEmpty(PsiTreeUtil.findChildrenOfType(myFixture.file, PsiErrorElement::class.java))
+        val errors = myFixture.doHighlighting().filter { it.severity == HighlightSeverity.ERROR }
+        assertTrue(errors.map { it.description }.toString(), errors.isEmpty())
     }
 
     fun testExplicitDialectMappingCanSelectEitherProductOnAnOrdinarySqlFile() {
