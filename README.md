@@ -131,3 +131,16 @@ guarantee server acceptance. Transport limitations still apply.
 The editor popup offers **Preview Generated SQL** and **Run Stages up to Caret**. Preview
 does not execute SQL. Run-to-stage submits only the top-level pipeline prefix through the
 stage at your cursor.
+
+## Related plugins and tools
+
+- [Apache Doris SQL](https://plugins.jetbrains.com/plugin/32777-sql-dialect-for-apache-doris)
+  dialect for JetBrains IDEs.
+- [ClickHouse SQL](https://github.com/sort-dev/clickhouse-intellij-plugin) dialect for JetBrains
+  IDEs.
+- [DuckDB SQL](https://plugins.jetbrains.com/plugin/33098-sql-dialect-for-duckdb-embedded--quack-)
+  dialect for JetBrains IDEs, for embedded DuckDB and Quack servers.
+- [Trino SQL](https://plugins.jetbrains.com/plugin/33124-sql-dialect-for-trino) dialect for
+  JetBrains IDEs.
+- [SQL Transpiler](https://plugins.jetbrains.com/plugin/32900-sql-transpiler) converts SQL between
+  supported database dialects in JetBrains IDEs.
