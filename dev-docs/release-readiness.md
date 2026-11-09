@@ -1,6 +1,22 @@
 # Release readiness review
 
-## Prepared 0.3.0 (Brikk 1.0.1)
+## Published 0.3.0 (Brikk 1.0.1)
+
+The owner-authorized GitHub release is published:
+https://github.com/sort-dev/datafusion-spice-intellij-plugin/releases/tag/v0.3.0.
+Source/tag commit: `6b11b06fbb805cafee0439e2443bbfd4cf9cc50c`, which passed main CI
+https://github.com/sort-dev/datafusion-spice-intellij-plugin/actions/runs/42717571779
+with 85 tests per runtime in both Kotlin modes. The shared release workflow passed:
+https://github.com/sort-dev/datafusion-spice-intellij-plugin/actions/runs/42723883476.
+
+The published `datafusion-spice-intellij-plugin-0.3.0.zip` has SHA-256
+`51010ca81f84d285f468042b8ba5c46a946ea2f28eddc32ca368429669a43a5a`, matching the
+GitHub asset digest. It passes `verify-release-zip.py`, declares version 0.3.0 and
+builds 261–263.*, and embeds the same five Brikk 1.0.1 JARs as the local
+release-mode ZIP below. The main plugin JAR differs from the local build only in
+its manifest's Build-JVM and Build-OS lines. Marketplace upload was not performed.
+
+### Preparation record
 
 Plugin 0.3.0 moves SQL core, metadata and verification API, and IntelliJ
 common/JDBC/test support, from 0.23.0/0.4.1 to 1.0.1 on Maven Central (brikk-sql
@@ -44,8 +60,8 @@ SQL-only lane and live Flight fixtures were not rerun; their earlier results
 and the owner's deferral of restart-free changes still apply. Logs and archived
 XML are under `build/release-030/`.
 
-The owner dispatches the release workflow from `release/0.3.0`. Marketplace
-upload remains separate.
+The owner authorized the dispatch from `release/0.3.0`. Marketplace upload
+remains separate.
 
 ## Published 0.2.0
 

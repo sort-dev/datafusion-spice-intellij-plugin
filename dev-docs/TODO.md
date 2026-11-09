@@ -86,6 +86,10 @@ not establish the live editor/connection experience.
 
 ## Implemented and automatically checked
 
+- [x] Publish the owner-authorized 0.3.0 GitHub release from 6b11b06 through
+  shared workflow 42723883476. Published ZIP SHA-256
+  51010ca81f84d285f468042b8ba5c46a946ea2f28eddc32ca368429669a43a5a; descriptor and
+  Brikk 1.0.1 payload checks pass. No Marketplace upload.
 - [x] Adopt Brikk SQL and IntelliJ common/JDBC/test support 1.0.1 for plugin
   0.3.0. 85 ordinary tests pass per IDEA runtime in both Kotlin modes (510
   executions), 30 installed-ZIP executions pass for 0.2.0 then 0.3.0, and all
