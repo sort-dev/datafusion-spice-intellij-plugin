@@ -3,17 +3,37 @@
     <name>SQL Dialects for DataFusion &amp; Spice</name>
     <vendor url="https://sort.dev" email="jayson@sort.dev">Sortdev SRL</vendor>
     <description><![CDATA[
-        <p>Write DataFusion and Spice SQL with completion, navigation and local error checking
-        in DataGrip and IntelliJ IDEA with Database Tools, on IDE builds 261 through 263.</p>
+        <p>Add separate Apache DataFusion and Spice SQL dialects to DataGrip and IntelliJ IDEA
+        with Database Tools. Brikk's product-specific parsers provide local parsing and syntax
+        checks. These are independent SQL dialect implementations, not the database engines' own
+        parsers.</p>
+
+        <p>Bundled metadata covers <b>DataFusion 55.2.0</b> and <b>Spice 2.4.0</b>. Flight SQL
+        endpoint verification uses the same versions. Other versions receive labeled fallback
+        metadata, not an exact-version support claim.</p>
+
+        <p>Optional Brikk PIPE support lowers supported pipelines into ordinary SQL for the same
+        selected product before execution. Local checks reject unsupported lowering and remaining
+        PIPE syntax. The generated SQL is sent in place of the PIPE text; native server verification
+        is unavailable.</p>
+
+        <p>Compatible with IDE builds 261 through 263.</p>
+
         <ul>
-            <li>Product-specific parsing, highlighting, completion, documentation and local diagnostics.</li>
-            <li>Independent live catalog inventories and explicit catalog refresh actions.</li>
-            <li>Product-specific Apache Arrow Flight SQL JDBC connection templates.</li>
-            <li>Optional, off-by-default Brikk PIPE preview and execution for each product.</li>
+            <li><b>Product-aware editing.</b> Separate DataFusion and Spice highlighting, function
+                completion, documentation, reference navigation and local diagnostics.</li>
+            <li><b>Live catalogs.</b> Independent product inventories, targeted introspection and
+                explicit catalog refresh actions.</li>
+            <li><b>Flight SQL connections.</b> Product-specific Apache Arrow Flight SQL JDBC 19.0.0
+                connection templates.</li>
+            <li><b>PIPE editing tools.</b> Independent, off-by-default settings, stage completion,
+                generated-SQL preview and run-to-stage for each product.</li>
         </ul>
-        <p>Background native verification is unavailable. Connection behavior depends on the
-        installed JDBC driver and server. See the README for version-specific upstream limitations.
-        DataFusion deployments must expose the required Flight SQL and information-schema contract.</p>
+
+        <p>Background checks do not prepare statements, run EXPLAIN or execute your SQL. Connection
+        behavior depends on the installed JDBC driver and server. See the README for version-specific
+        upstream limitations. DataFusion deployments must expose the required Flight SQL and
+        information-schema contract.</p>
         <p>This independent Sortdev SRL plugin is not affiliated with or endorsed by the
         Apache Software Foundation, Apache DataFusion, Apache Arrow or Spice.ai.</p>
     ]]></description>

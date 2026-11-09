@@ -1,12 +1,21 @@
-# DataFusion and Spice SQL for JetBrains IDEs
+# DataFusion and Spice SQL for DataGrip and IntelliJ IDEA
 
-One plugin with separate Apache DataFusion and Spice SQL dialects for DataGrip and
-IntelliJ IDEA with Database Tools, on IDE builds 261 through 263.
+Add separate Apache DataFusion and Spice SQL dialects to DataGrip and IntelliJ IDEA
+with Database Tools. Brikk's product-specific parsers provide local syntax checks,
+alongside highlighting, function completion, documentation and reference navigation.
+These are independent SQL dialect implementations, not the database engines' own
+parsers. Compatible with IDE builds 261 through 263.
 
-The plugin provides product-specific SQL parsing, highlighting, function completion,
-documentation and local diagnostics. Select **DataFusion (sort.dev)** or
-**Spice (sort.dev)** for SQL files. Product-specific data sources select the matching
-dialect for their consoles.
+Bundled metadata covers **DataFusion 55.2.0** and **Spice 2.4.0**. Flight SQL endpoint
+verification uses the same versions. Other versions receive labeled fallback metadata,
+not an exact-version support claim.
+
+Optional Brikk PIPE support lowers supported pipelines into SQL before execution.
+Local checks reject unsupported lowering and remaining PIPE syntax, but native server
+verification is unavailable. See [Brikk PIPE](#brikk-pipe).
+
+Select **DataFusion (sort.dev)** or **Spice (sort.dev)** for SQL files. Product-specific
+data sources select the matching dialect for their consoles.
 
 This is an independent plugin by Sortdev SRL, not an official Apache DataFusion,
 Apache Software Foundation or Spice.ai product. Product names identify the engines
@@ -31,7 +40,9 @@ After connecting, the plugin reads the current catalog and schema. A new data
 source's unset introspection scope selects that reported default namespace;
 existing schema selections are preserved. Completion and SQL references can
 request unloaded namespaces as you type or open a query. Catalog changes restart
-editor analysis without requiring a text edit.
+editor analysis without requiring a text edit. Live inventories keep the two
+products and their versions separate. Database-tree coverage depends on the
+endpoint's JDBC metadata support.
 
 ### Current namespace
 
@@ -102,19 +113,21 @@ SELECT
 
 Expected result: `Ada | 30`.
 
-Bundled metadata covers DataFusion 55.2.0 and Spice 2.4.0. Other versions receive
-labeled fallback metadata, not an exact-version support claim. Live inventories
-keep the two products and their versions separate. Database-tree coverage depends
-on the endpoint's JDBC metadata support.
-
-Local development builds are not a published or fully qualified production release.
-
 ## Brikk PIPE
 
 Enable either product independently under **Settings > Tools > Database >
-DataFusion Brikk PIPE** or **Spice Brikk PIPE**. Both are off by default.
+DataFusion Brikk PIPE** or **Spice Brikk PIPE**. Both are off by default. PIPE support
+is included in this plugin; a separate SQL Transpiler installation is not required.
 
-The editor popup offers generated-SQL preview and run-to-stage. Brikk PIPE lowers
-supported stages to SQL for the selected product; it is not a promise of native
-pipe-syntax support. Preview states that native server verification is unavailable.
-Transport limitations still apply to the generated SQL.
+Before execution, Brikk lowers supported stages into ordinary SQL for the same selected
+product: DataFusion PIPE becomes DataFusion SQL, and Spice PIPE becomes Spice SQL. This
+is not cross-dialect conversion or native pipe-syntax support. Only the generated SQL is
+sent to the server; your PIPE document is not rewritten.
+
+Local checks reject unsupported lowering and any remaining PIPE syntax. The generated SQL
+is not validated by DataFusion or Spice itself before submission, so these checks do not
+guarantee server acceptance. Transport limitations still apply.
+
+The editor popup offers **Preview Generated SQL** and **Run Stages up to Caret**. Preview
+does not execute SQL. Run-to-stage submits only the top-level pipeline prefix through the
+stage at your cursor.
