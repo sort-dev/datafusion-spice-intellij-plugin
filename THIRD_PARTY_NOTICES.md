@@ -3,29 +3,28 @@
 This plugin embeds the following Apache License 2.0 artifacts, Copyright Brikk /
 Sortdev SRL, from https://github.com/brikk/brikk-sql:
 
-- `brikk-sql-jvm:0.23.0`
-- `brikk-sql-metadata-jvm:0.23.0`
-- `brikk-sql-verify-api:0.23.0`
-- `brikk-sql-intellij-support:0.4.1`
-- `brikk-sql-intellij-jdbc-support:0.4.1`
+- `brikk-sql-jvm:1.0.1`
+- `brikk-sql-metadata-jvm:1.0.1`
+- `brikk-sql-verify-api:1.0.1`
+- `brikk-sql-intellij-support:1.0.1`
+- `brikk-sql-intellij-jdbc-support:1.0.1`
 
 ## Historical owner-authorized local qualification candidate
 
-Ordinary builds use released 0.4.1 above. The accepted pre-release qualification
-used the coordinates below, retained here for its archived ZIP and explicit
-snapshot override. Only when the explicit
-qualification override is supplied, the two IntelliJ runtime artifacts are
-replaced with the following Apache License 2.0 local SNAPSHOT publications,
-Copyright Brikk / Sortdev SRL:
+Ordinary builds use released 1.0.1 above. The 0.2.0-era pre-release qualification
+used the coordinates below, retained here for its archived ZIP. Only under that
+explicit qualification override were the two IntelliJ runtime artifacts replaced
+with the following Apache License 2.0 local SNAPSHOT publications, Copyright
+Brikk / Sortdev SRL:
 
 - `brikk-sql-intellij-support:0.4.1-livecatalog-races-20261104-g2a46bd08efcd-SNAPSHOT`
 - `brikk-sql-intellij-jdbc-support:0.4.1-livecatalog-races-20261104-g2a46bd08efcd-SNAPSHOT`
 
 Candidate source commit: `2a46bd08efcde21e080e8f0a88d68fc997383fc8` in
-https://github.com/brikk/brikk-sql. SQL core/metadata/verification API remain at
-released 0.23.0. This is not a stable/public release. The aligned candidate
-test-support artifact remains test-only and is not embedded. The upstream
-licenses and inherited notices below apply unchanged.
+https://github.com/brikk/brikk-sql. That candidate paired them with released SQL
+core/metadata/verification API 0.23.0. It was not a stable/public release. The
+aligned candidate test-support artifact was test-only and not embedded. The
+upstream licenses and inherited notices below apply unchanged.
 
 ## Inherited Brikk SQL notices
 

@@ -38,6 +38,11 @@
         Apache Software Foundation, Apache DataFusion, Apache Arrow or Spice.ai.</p>
     ]]></description>
     <change-notes><![CDATA[
+        <p>0.3.0: Brikk SQL 1.0.1 and IntelliJ support 1.0.1.</p>
+        <ul>
+            <li>Local DataFusion and Spice syntax checks and Brikk PIPE lowering include the SQLGlot 30.29 catch-up.</li>
+            <li>Generated SQL keeps a VALUES alias before its nested join.</li>
+        </ul>
         <p>0.2.0: first public release.</p>
         <ul>
             <li>Separate DataFusion and Spice SQL dialects and Flight SQL connection templates.</li>

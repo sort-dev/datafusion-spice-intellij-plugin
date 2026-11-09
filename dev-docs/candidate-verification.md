@@ -2,7 +2,8 @@
 
 This records the historical owner-authorized Maven Local SNAPSHOT qualification,
 not a stable or public release. The ordinary default has since moved to public
-0.4.1. See [stable-041-verification.md](stable-041-verification.md). Statements below
+0.4.1 and then Brikk 1.0.1. See [stable-041-verification.md](stable-041-verification.md)
+and [release-readiness.md](release-readiness.md). Statements below
 about the unchanged 0.4.0 default describe the snapshot acceptance checkpoint.
 
 ## Exact input

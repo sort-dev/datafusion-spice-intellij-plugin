@@ -7,34 +7,35 @@ qualified release. Earlier exploratory results are in
 
 The engineering follow-up is recorded in
 [engineering-qualification.md](engineering-qualification.md). The ordinary default
-now uses public IntelliJ support 0.4.1, whose binaries and sources match the
-accepted race-fix snapshot. Stable consumer requalification is recorded in
-[stable-041-verification.md](stable-041-verification.md). The earlier snapshot
-evidence remains in [candidate-verification.md](candidate-verification.md).
+now uses Brikk SQL and IntelliJ support 1.0.1; its 0.3.0 release qualification is
+recorded in [release-readiness.md](release-readiness.md). The earlier 0.4.1
+requalification is in [stable-041-verification.md](stable-041-verification.md)
+and the snapshot evidence in [candidate-verification.md](candidate-verification.md).
 
 ## Standard runtime checks
 
-The current clean dogfood ZIP uses released support 0.4.1:
-`build/dogfood/datafusion-spice-intellij-plugin-0.1.0-dev.202611051726+b4734e4bc399.zip`.
-SHA-256: `a4a96d9069aa226be664bd8fcffe68e570947e763509e5fad765c5971c570613`.
-It passed the full stable-default matrix and all five local verifier targets.
-See stable-041-verification.md for exact evidence and remaining approval gaps.
+The 0.3.0 release candidate uses Brikk SQL and IntelliJ support 1.0.1. Its
+local release-mode ZIP, gate counts and verifier results are recorded in
+release-readiness.md. The earlier 0.4.1 dogfood ZIP and its matrix are in
+stable-041-verification.md.
 
-Build JDK 21.0.2, Gradle 9.0.0, Kotlin 2.4.10, SQL 0.23.0 and IntelliJ
-support/JDBC/test support 0.4.1. Tests use each IDE's bundled runtime.
+Build JDK 21.0.2, Gradle 9.0.0, Kotlin 2.4.10, SQL 1.0.1 and IntelliJ
+support/JDBC/test support 1.0.1. Tests use each IDE's bundled runtime.
 
 ```sh
 ./gradlew test test262 test263 buildPlugin verifyDistribution
 ./gradlew test test262 test263 -Ptest.kotlin=present
 ```
 
-The expanded standard suite passes 84 tests per runtime with zero
-failures/errors/skips, 504 executions across the two Kotlin modes. The latest
-serialized local pass is `build/engineering/serial-resume.log`; XML and checked
-summaries are under `build/engineering/stable84-absent/` and `stable84-present/`.
-Actual DataGrip 261/262 each pass the same 84-test suite in a dedicated SQL-only
-lane, with only the chosen DataGrip SDK on the runtime classpath. Their evidence
-is under `build/engineering/stable84-datagrip-261/` and `stable84-datagrip-262/`.
+On Brikk 1.0.1 the standard suite passes 85 tests per runtime with zero
+failures/errors/skips, 510 executions across the two Kotlin modes. The added
+test checks Brikk's DataFusion diagnostics for `13END` and a VALUES alias before a
+nested join. The earlier 84-test 0.4.1 serialized local pass is
+`build/engineering/serial-resume.log`; XML and checked summaries are under
+`build/engineering/stable84-absent/` and `stable84-present/`. On 0.4.1, actual
+DataGrip 261/262 each passed the same 84-test suite in a dedicated SQL-only
+lane (not rerun on 1.0.1), with only the chosen DataGrip SDK on the runtime
+classpath. Their evidence is under `build/engineering/stable84-datagrip-261/` and `stable84-datagrip-262/`.
 The global physical-reference search was also rerun on all three runtimes in
 `build/nap/physical-indexed-matrix.log` and `physical-indexed-xml/`.
 The earlier 63-test lifecycle evidence remains under `build/lifecycle/`.
@@ -291,8 +292,8 @@ SHA-256 `8239c5cdf1da9312a0d0dbe2fca104ff66d87862532438bd3e211e59951fa6ec`.
 It embeds the exact authorized local snapshot, passes all five verifier targets
 and distribution checks, and is not a stable/public release. See
 candidate-verification.md for provenance, all passing race/matrix results and
-the historical snapshot checkpoint. The ordinary default now consumes public
-0.4.1; stable-041-verification.md records its separate rebuild and qualification.
+the historical snapshot checkpoint. The ordinary default moved to public 0.4.1
+(stable-041-verification.md) and then Brikk 1.0.1 (release-readiness.md).
 
 The user's live-window symptoms, driver-dialog upgrades, clean interactive installs,
 production TLS/auth policy, cross-library cache migration and full DataFusion

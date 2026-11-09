@@ -7,7 +7,7 @@ plugins {
 group = "dev.sort.datafusionspice"
 val supportCandidate = providers.gradleProperty("qualification.brikkSupportVersion")
     .orElse(providers.environmentVariable("BRIKK_SUPPORT_CANDIDATE"))
-version = "0.2.0"
+version = "0.3.0"
 if (supportCandidate.isPresent) version = "$version-qualification"
 
 sqlDialectPlugin {

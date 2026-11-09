@@ -1,9 +1,10 @@
 # Released Brikk 0.4.1 consumer verification
 
-The ordinary dependency default is now public Maven Central IntelliJ
-common/JDBC/test support 0.4.1. SQL core, metadata and verification API remain
-released 0.23.0. The guarded snapshot override remains opt-in and cannot be used
-with release mode. No plugin release, tag or Marketplace publication is authorized.
+Superseded: the ordinary default now uses Brikk SQL and IntelliJ support 1.0.1;
+see release-readiness.md. This record covers the 0.2.0-era default of public
+Maven Central IntelliJ common/JDBC/test support 0.4.1 with SQL core, metadata and
+verification API 0.23.0. The guarded snapshot override remains opt-in and cannot
+be used with release mode.
 
 ## Public provenance
 

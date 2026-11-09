@@ -87,6 +87,6 @@ diagnostics remain independent. Prompted parameter values are not read or persis
   registration set. No fixture installer or source dependency is used by the plugin.
 
 The shared conventions are vendored at
-`a30cc5588f9ba1e40dcaf3e39e7735849f5fe2d2`. SQL 0.23.0/support 0.4.1 use per-repo
+`a30cc5588f9ba1e40dcaf3e39e7735849f5fe2d2`. SQL 1.0.1/support 1.0.1 use per-repo
 version overrides and Maven Central, not Maven Local. Original plugin artwork
 avoids claiming rights to product logos.

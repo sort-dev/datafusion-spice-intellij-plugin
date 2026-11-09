@@ -1,5 +1,52 @@
 # Release readiness review
 
+## Prepared 0.3.0 (Brikk 1.0.1)
+
+Plugin 0.3.0 moves SQL core, metadata and verification API, and IntelliJ
+common/JDBC/test support, from 0.23.0/0.4.1 to 1.0.1 on Maven Central (brikk-sql
+main `0ecace0f`, changelog `brikk-sql/docs/sql-1.0.1.md`). No plugin code
+changed. Brikk catches are not used in `src/main`, so the new `BrikkSqlError` base
+class needs no consumer change. Change notes are in plugin.xml and
+`change-notes.html`; suggested GitHub text is in `github-0.3.0.md`.
+
+Of the SQLGlot 30.29 catch-up fixes, two reach the DataFusion and Spice dialects:
+
+- `13END` is now read as `13 END`, so Brikk no longer reports "Expected END after
+  CASE". The editor still shows the inherited PostgreSQL lexer's "Bad characters"
+  error for it, so the change notes do not claim it as fixed. See TODO.md.
+- A VALUES alias is written before its nested join in generated DataFusion SQL.
+  Direct `transpile` probes for both dialects confirmed the 0.23.0 misordering
+  and the corrected 1.0.1 output.
+
+The MySQL, Doris and DuckDB items in that changelog do not apply to these dialects.
+`EditorFeaturesTest` adds one test for both cases. On 0.23.0/0.4.1 it fails with
+Brikk's CASE error; on 1.0.1 it passes.
+
+Local gates on JDK 21.0.2, all with zero failures, errors or skips:
+
+| Gate | Result |
+| --- | --- |
+| `./gradlew build` (includes `verifyDistribution`) | 85 tests on 261, ZIP verified |
+| `test test262 test263 -Ptest.kotlin=absent` | 85 per runtime |
+| `test test262 test263 -Ptest.kotlin=present` | 85 per runtime |
+| Python tools tests | 15 |
+| `buildPlugin verifyPlugin` (five targets) | Compatible on all five: 1 internal, 11 experimental, 1 deprecated, unchanged |
+| `buildPlugin verifyPlugin -Prelease=true` with the release workflow's two IDEs | Compatible |
+| `check-api-approvals.py` | 1 approved internal usage, 0 unapproved per target |
+| `verify-release-zip.py` | passes for `datafusion-spice-intellij-plugin-0.3.0.zip` |
+| Installed-ZIP lane, published 0.2.0 then 0.3.0 in the same sandboxes | 5 tests × 3 runtimes each, 30 executions |
+
+The local release-mode ZIP embeds exactly the five 1.0.1 runtime JARs listed in
+artifact-provenance.md, which match the Maven Central SHA-1 sidecars. Its local
+SHA-256 was `061330cbdd4b589b26d8d303eccc81ff329b7848fbd6cb5735837b989702fa37`;
+the workflow builds its own ZIP. The opt-in dynamic lifecycle probe, DataGrip
+SQL-only lane and live Flight fixtures were not rerun; their earlier results
+and the owner's deferral of restart-free changes still apply. Logs and archived
+XML are under `build/release-030/`.
+
+The owner dispatches the release workflow from `release/0.3.0`. Marketplace
+upload remains separate.
+
 ## Published 0.2.0
 
 The owner-authorized GitHub release is published:

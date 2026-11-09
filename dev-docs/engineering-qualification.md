@@ -1,9 +1,10 @@
 # Engineering qualification follow-up
 
 This report preserves the released 0.4.0 baseline and original qualification
-request. Both races subsequently passed the accepted snapshot and the ordinary
-default now consumes public 0.4.1. See stable-041-verification.md for current
-consumer evidence and candidate-verification.md for the snapshot checkpoint.
+request. Both races subsequently passed the accepted snapshot and public 0.4.1;
+the ordinary default now consumes Brikk 1.0.1 (see release-readiness.md). See
+stable-041-verification.md for the 0.4.1 evidence and candidate-verification.md
+for the snapshot checkpoint.
 
 This pass separates supported behavior, tested exclusions and dependency blockers.
 It does not turn a green ordinary suite into a claim that the race reproducers pass.

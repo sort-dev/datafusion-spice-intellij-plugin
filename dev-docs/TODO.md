@@ -21,9 +21,10 @@ not establish the live editor/connection experience.
   same-connection recovery have a bounded disposable-process lane. A driver that
   ignores cancel or blocks inside cancel/close is not covered by that result.
 - [ ] Qualify broader reconnect/disposal ordering beyond the two fixed catalog
-  races. Released Brikk 0.4.1 now passes both desired contracts on real helpers
-  across IDEA 261/262/263 and DataGrip 261/262. No second consumer cache/generation
-  manager or locally patched library was added. See stable-041-verification.md.
+  races. Released Brikk 0.4.1 passed both desired contracts on real helpers
+  across IDEA 261/262/263 and DataGrip 261/262; the 1.0.1 ordinary matrix keeps
+  those tests green. The live race lanes were not rerun for 1.0.1. No second
+  consumer cache/generation manager or locally patched library was added. See stable-041-verification.md.
   A strict opt-in headless lifecycle probe passes 261 disable/re-enable but 262
   and 263 reject dynamic disable. The owner accepted this limitation and deferred
   further checking to normal use. It is not a release blocker. Preserve the
@@ -56,6 +57,13 @@ not establish the live editor/connection experience.
   See release-readiness.md.
 - [ ] Request sixth-plugin adoption in shared staging and reverse peer-isolation
   lists. Do not modify the vendored conventions to hide hardcoded shared lists.
+- [ ] `SELECT CASE WHEN true THEN 13END` still shows "Bad characters" in the
+  DataFusion editor; Spice uses the same lexer. Brikk 1.0.1 fixed its own tokenizer (it read `13END` as `13E` + `ND`
+  through 0.23.0), so Brikk's "Expected END after CASE" error is gone. Its native
+  error annotator then falls back to the inherited JetBrains PostgreSQL PSI
+  lexer's error for that statement, by design. Owner: the PostgreSQL PSI substrate
+  used by brikk-sql-intellij-support 1.0.1 `DatafusionFamilyDialect`. Do not hide
+  PSI errors locally; any change belongs upstream in Brikk support.
 
 ## Optional, not silently part of v1
 
@@ -78,6 +86,11 @@ not establish the live editor/connection experience.
 
 ## Implemented and automatically checked
 
+- [x] Adopt Brikk SQL and IntelliJ common/JDBC/test support 1.0.1 for plugin
+  0.3.0. 85 ordinary tests pass per IDEA runtime in both Kotlin modes (510
+  executions), 30 installed-ZIP executions pass for 0.2.0 then 0.3.0, and all
+  five verifier targets are Compatible with the unchanged accepted API baseline.
+  See release-readiness.md.
 - [x] Publish the owner-authorized 0.2.0 GitHub release from becd4ce through shared
   workflow 42255315150. Downloaded release ZIP has SHA-256
   af512ddef536e684555341ba4e1d52b5377aeb255d0548a7df369ebe2937ee28;
