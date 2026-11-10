@@ -1,13 +1,33 @@
 # Release readiness review
 
-## Next release: IDE 2026.2 and later
+## Prepared 0.4.0: IDE 2026.2 and later on Java 25
 
-The next release drops IDE line 2026.1 (build 261). The vendored conventions at
+Plugin 0.4.0 drops IDE line 2026.1 (build 261). The vendored conventions at
 `387c9f39bf66142cf9f07074bc340f44ae1d3801` compile against the 262 SDK with
 since-build 262 (until-build stays 263.*) and Java 25 bytecode, class major 69,
 because 2026.2 requires Java 25. `mise.toml`, CI and the release workflow input
-use Java 25. The draft change notes in plugin.xml and `change-notes.html` carry an
-Unreleased line saying so; past entries are unchanged. No version was chosen.
+use Java 25. Brikk SQL and IntelliJ support remain 1.0.1; no library pin changed.
+The former Unreleased change-notes entry is now the 0.4.0 entry in plugin.xml and
+`change-notes.html`; suggested GitHub text is in `github-0.4.0.md`.
+
+Release-mode gates for 0.4.0 on JDK 25.0.2, all with zero failures, errors or skips:
+
+| Gate | Result |
+| --- | --- |
+| `./gradlew build`, `test262 test263` | 85 tests per runtime |
+| `buildPlugin verifyPlugin` (four targets) | Compatible on all four: 1 internal, 11 experimental, 1 deprecated, unchanged |
+| `-Prelease=true build verifyRelease buildPlugin verifyPlugin` with the release workflow's two IDEs | 85 tests, Compatible on both |
+| `check-api-approvals.py` | 1 approved internal usage, 0 unapproved per target |
+| `verify-release-zip.py` | passes for `datafusion-spice-intellij-plugin-0.4.0.zip` |
+| Python tools tests, shared tool tests | 15, passing |
+
+The local release-mode ZIP declares version 0.4.0 and builds 262–263.*, embeds the
+same five Brikk 1.0.1 JARs as 0.3.0, and every plugin class is major 69. Its local
+SHA-256 was `3fad2e59e50b2d2a854894d22b0c69ff0afb08a205c14ba1f289faee89d6b80b`;
+the workflow builds its own ZIP. Installed-ZIP, DataGrip SQL-only and live Flight
+lanes were not rerun for 0.4.0.
+
+The preparation gates of the 2026.1 drop itself are below.
 
 Local gates on JDK 25.0.2, all with zero failures, errors or skips:
 
