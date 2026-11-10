@@ -1,9 +1,10 @@
 # Development
 
 The build follows the sibling sort-dev SQL plugins: Gradle 9.0.0, vendored
-`dev.sort.sql-dialect-plugin` conventions, Kotlin 2.4.10 and Java 21 bytecode.
+`dev.sort.sql-dialect-plugin` conventions, Kotlin 2.4.10 and Java 25 bytecode.
 SQL 1.0.1 and IntelliJ support 1.0.1 resolve from Maven Central.
-`mise.toml` pins Java 21.0.2 as DuckDB and Doris do. Use that JDK as JAVA_HOME;
+`mise.toml` pins Java 25.0.2 as Trino does; IDE lines 2026.2 and 2026.3 require
+Java 25, and 2026.1 (261) is no longer supported. Use that JDK as JAVA_HOME;
 with mise, trust this local project configuration and use `mise exec -- ./gradlew`.
 
 ```sh
@@ -50,7 +51,7 @@ cargo build --locked --manifest-path /path/to/brikk-sql/tools/datafusion-referen
 python3 tools/run-flight-smoke.py --java-home "$JAVA_HOME"
 ```
 
-Use JDK 21 for the Gradle process. The actual tests use the IDE's bundled runtime
+Use JDK 25 for the Gradle process. The actual tests use the IDE's bundled runtime
 and the driver JVM flags. Run `--product spice` or `--product datafusion` to select
 one fixture. Results/status are under `build/readiness/`. These loopback checks
 are not production TLS/authentication or interactive IDE qualification.

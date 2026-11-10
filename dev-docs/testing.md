@@ -39,7 +39,9 @@ classpath. Their evidence is under `build/engineering/stable84-datagrip-261/` an
 The global physical-reference search was also rerun on all three runtimes in
 `build/nap/physical-indexed-matrix.log` and `physical-indexed-xml/`.
 The earlier 63-test lifecycle evidence remains under `build/lifecycle/`.
-The configured builds are 261.25134.95, 262.10968.63 and 263.5701.42.
+Those 0.3.0 runs used builds 261.25134.95, 262.10968.63 and 263.5701.42. The
+next release drops 261: `test` and `test262` both run 262.10968.63 and `test263`
+runs 263.5701.42, on JDK 25.0.2.
 
 Coverage now includes:
 

@@ -74,7 +74,7 @@ class ReleaseReadinessTests(unittest.TestCase):
         self.assertNotRegex(workflow, r'(?m)^  (push|pull_request|schedule):', msg='Publication must be manual-only')
         self.assertIn("startsWith(github.ref, 'refs/heads/release/')", workflow)
         self.assertIn("inputs.authorization == 'publish-github-release'", workflow)
-        self.assertIn('@a30cc5588f9ba1e40dcaf3e39e7735849f5fe2d2', workflow)
+        self.assertIn('@387c9f39bf66142cf9f07074bc340f44ae1d3801', workflow)
         self.assertNotIn('publishPlugin', workflow)
         build = (root / 'build.gradle.kts').read_text()
         versions = re.findall(r'^version = "([^"]+)"$', build, re.MULTILINE)

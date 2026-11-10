@@ -16,19 +16,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up JDK 21
+      - name: Set up JDK 25
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 21
+          java-version: 25
       - uses: gradle/actions/setup-gradle@v4
-      - name: Test 261, 262 and 263 without Kotlin
+      - name: Test 262 and 263 without Kotlin
         id: test_absent
         run: ./gradlew test test262 test263 -Ptest.kotlin=absent --max-workers=2
       - name: Preserve Kotlin-absent XML before the next mode
         if: always() && steps.test_absent.outcome != 'skipped'
         run: python3 tools/archive-test-results.py --destination build/ci/kotlin-absent --require-passing
-      - name: Test 261, 262 and 263 with Kotlin
+      - name: Test 262 and 263 with Kotlin
         id: test_present
         run: ./gradlew test test262 test263 -Ptest.kotlin=present --max-workers=2
       - name: Preserve Kotlin-present XML
@@ -64,7 +64,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 21
+          java-version: 25
       - uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew verifyPlugin --max-workers=2
       - name: Preserve complete verifier reports

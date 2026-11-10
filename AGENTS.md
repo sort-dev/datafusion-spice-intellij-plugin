@@ -16,6 +16,6 @@
   actual owners and issue links. Do not add unconditional editor banners or SQL
   warnings that assume every user-installed driver/server still has those bugs.
 - Test actual descriptor loading, PSI/console behavior and background logged
-  errors on 261/262/263. Shared-library tests alone are not consumer qualification.
+  errors on 262/263. Shared-library tests alone are not consumer qualification.
 - Never copy another plugin's internal-API exemptions. Publication and pushes
   require explicit owner authorization. Local build success does not grant it.

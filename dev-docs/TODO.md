@@ -6,7 +6,7 @@ not establish the live editor/connection experience.
 
 ## Core gates still open
 
-- [ ] Exercise clean interactive ZIP installs on 261/262/263, including actual
+- [ ] Exercise clean interactive ZIP installs on 262/263, including actual
   driver-process launch, secure credential handling, URL controls, both dialects,
   settings, preview/run UI and disposal/unload behavior.
   Actual archived snapshot and stable ZIPs now load through private plugin

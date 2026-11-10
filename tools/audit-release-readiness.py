@@ -8,8 +8,7 @@ from pathlib import Path
 import re
 
 PLUGIN_ID = 'dev.sort.datafusion-spice-intellij-plugin'
-TARGETS = ('DB-261.24374.56', 'DB-262.10315.132', 'IU-262.10968.63',
-           'IU-263.4732.28', 'IU-263.5701.42')
+TARGETS = ('DB-262.10315.132', 'IU-262.10968.63', 'IU-263.4732.28', 'IU-263.5701.42')
 CATEGORIES = {'internal': 'internal-api-usages.txt',
               'experimental': 'experimental-api-usages.txt',
               'deprecated': 'deprecated-usages.txt'}

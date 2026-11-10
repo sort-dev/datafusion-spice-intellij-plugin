@@ -17,10 +17,10 @@ artifact. A common Flight URL never selects a product on its own.
 Both templates set the complete Arrow driver VM options through the existing
 `<vm-options>` element: `--add-opens=java.base/java.nio=ALL-UNNAMED
 --sun-misc-unsafe-memory-access=allow`. These target the bundled IDE driver runtime,
-not the Java 21 Gradle build process. Preserve explicit user driver customizations;
+not the Java 25 Gradle build process. Preserve explicit user driver customizations;
 do not mutate global IDE settings or saved VM overrides behind the user's back.
 An explicitly selected older driver JVM is a custom configuration; Java 21 does
-not accept the Java 25 unsafe-memory option. This does not change the Java 21
+not accept the Java 25 unsafe-memory option. This does not change the Java 25
 build/bytecode target or make manual setup necessary for the normal bundled runtime.
 
 Editor adapters are no-argument subclasses of released Brikk support. Each stable
@@ -87,6 +87,7 @@ diagnostics remain independent. Prompted parameter values are not read or persis
   registration set. No fixture installer or source dependency is used by the plugin.
 
 The shared conventions are vendored at
-`a30cc5588f9ba1e40dcaf3e39e7735849f5fe2d2`. SQL 1.0.1/support 1.0.1 use per-repo
-version overrides and Maven Central, not Maven Local. Original plugin artwork
-avoids claiming rights to product logos.
+`387c9f39bf66142cf9f07074bc340f44ae1d3801`: the 262 SDK, since-build 262 and
+Java 25. SQL 1.0.1/support 1.0.1 use per-repo version overrides and Maven
+Central, not Maven Local. Original plugin artwork avoids claiming rights to
+product logos.

@@ -1,5 +1,33 @@
 # Release readiness review
 
+## Next release: IDE 2026.2 and later
+
+The next release drops IDE line 2026.1 (build 261). The vendored conventions at
+`387c9f39bf66142cf9f07074bc340f44ae1d3801` compile against the 262 SDK with
+since-build 262 (until-build stays 263.*) and Java 25 bytecode, class major 69,
+because 2026.2 requires Java 25. `mise.toml`, CI and the release workflow input
+use Java 25. The draft change notes in plugin.xml and `change-notes.html` carry an
+Unreleased line saying so; past entries are unchanged. No version was chosen.
+
+Local gates on JDK 25.0.2, all with zero failures, errors or skips:
+
+| Gate | Result |
+| --- | --- |
+| `./gradlew build` (includes `verifyDistribution`, `verifyBuildLogic`) | 85 tests on 262, ZIP verified |
+| `test262 test263 -Ptest.kotlin=absent` | 85 per runtime |
+| `test test262 test263 -Ptest.kotlin=present` | 85 per runtime |
+| Python tools tests | 15 |
+| `buildPlugin verifyPlugin` (four targets, no 261) | Compatible on all four: 1 internal, 11 experimental, 1 deprecated, unchanged |
+| `check-api-approvals.py` | 1 approved internal usage, 0 unapproved per target |
+
+The verifier targets are DB-262.10315.132, IU-262.10968.63, IU-263.4732.28 and
+IU-263.5701.42. The packaged descriptor declares since-build 262, and every
+plugin class is major 69. The `-Ptest.pluginIsolation=true` lane, with SQL
+Transpiler absent and the released ClickHouse 0.4.0, Doris 1.7.0, DuckDB 0.7.0
+and Trino 0.6.0 ZIPs, runs only `PluginIsolationTest`: 5 tests per runtime on
+`test`/`test262`/`test263`, 15 executions. The installed-ZIP variant, the
+DataGrip SQL-only lane and the live Flight fixtures were not rerun.
+
 ## Published 0.3.0 (Brikk 1.0.1)
 
 The owner-authorized GitHub release is published:
@@ -200,7 +228,7 @@ was changed as part of this decision.
 
 Pending interactive matrix, in disposable IDE profiles rather than saved user settings:
 
-1. On each of 261/262/263, install the exact clean ZIP through Install Plugin from Disk.
+1. On each of 262/263, install the exact clean ZIP through Install Plugin from Disk.
 2. Upgrade an older plugin using both default driver settings and an explicit driver
    VM override. Verify explicit overrides survive and Java 25 defaults retain both flags.
 3. Open both dialects and a console, then disable the plugin. Record whether the IDE

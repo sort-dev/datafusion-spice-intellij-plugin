@@ -4,7 +4,7 @@ Add separate Apache DataFusion and Spice SQL dialects to DataGrip and IntelliJ I
 with Database Tools. Brikk's product-specific parsers provide local syntax checks,
 alongside highlighting, function completion, documentation and reference navigation.
 These are independent SQL dialect implementations, not the database engines' own
-parsers. Compatible with IDE builds 261 through 263.
+parsers. Compatible with IDE builds 262 and 263.
 
 Bundled metadata covers **DataFusion 55.2.0** and **Spice 2.4.0**. Flight SQL endpoint
 verification uses the same versions. Other versions receive labeled fallback metadata,
