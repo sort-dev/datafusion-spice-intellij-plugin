@@ -1,6 +1,22 @@
 # Release readiness review
 
-## Prepared 0.4.0: IDE 2026.2 and later on Java 25
+## Published 0.4.0: IDE 2026.2 and later on Java 25
+
+The GitHub release is published:
+https://github.com/sort-dev/datafusion-spice-intellij-plugin/releases/tag/v0.4.0.
+Source/tag commit: `0a9b82622fccec20b67c00941b4cd2982759cd44`, which passed main CI
+https://github.com/sort-dev/datafusion-spice-intellij-plugin/actions/runs/42924454974.
+The shared release workflow passed:
+https://github.com/sort-dev/datafusion-spice-intellij-plugin/actions/runs/42936573043.
+A duplicate dispatch, 42936744211, was cancelled before it published anything.
+
+The published `datafusion-spice-intellij-plugin-0.4.0.zip` has SHA-256
+`191c410d1894e0a73ee06e4e1fc0ebee5f3d1ac6691c483c316080b26ccbd9fe`, matching the
+GitHub asset digest. It passes `verify-release-zip.py`, declares builds 262–263.*
+and embeds the five Brikk 1.0.1 JARs. Marketplace upload was not performed.
+
+### Preparation record
+
 
 Plugin 0.4.0 drops IDE line 2026.1 (build 261). The vendored conventions at
 `387c9f39bf66142cf9f07074bc340f44ae1d3801` compile against the 262 SDK with

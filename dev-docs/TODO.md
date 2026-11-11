@@ -86,6 +86,10 @@ not establish the live editor/connection experience.
 
 ## Implemented and automatically checked
 
+- [x] Publish the 0.4.0 GitHub release (IDE 2026.2 and later, Java 25) from
+  0a9b826 through shared workflow 42936573043. Published ZIP SHA-256
+  191c410d1894e0a73ee06e4e1fc0ebee5f3d1ac6691c483c316080b26ccbd9fe; descriptor and
+  Brikk 1.0.1 payload checks pass. No Marketplace upload.
 - [x] Publish the owner-authorized 0.3.0 GitHub release from 6b11b06 through
   shared workflow 42723883476. Published ZIP SHA-256
   51010ca81f84d285f468042b8ba5c46a946ea2f28eddc32ca368429669a43a5a; descriptor and
