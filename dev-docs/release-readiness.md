@@ -281,14 +281,14 @@ Pending interactive matrix, in disposable IDE profiles rather than saved user se
 
 The prepared `.github/workflows/release.yml` has only manual dispatch. It calls
 the released shared workflow at the exact vendored-conventions commit. It has
-no push/tag trigger, no Marketplace step and no publishing token. Do not dispatch
-it until the owner separately authorizes a GitHub release.
+no push/tag trigger, no Marketplace step and no publishing token. Dispatch it
+only for an owner-requested release; that request authorizes the dispatch.
 
 That shared workflow creates a public tag and GitHub release, so even a manual
 dispatch is a publication action. Its typed confirmation is a safeguard, not an
 authorization granted by this review.
 
-Before a separately authorized release:
+For an owner-requested release:
 
 1. Preserve the accepted API baseline and deferred restart-free behavior. Reopen
    API review only if new usages appear; never import approvals from a peer.
@@ -299,8 +299,9 @@ Before a separately authorized release:
   The owner selected 0.2.0 to supersede the existing 0.1.0-dev builds.
 3. Replace the development change notes in plugin.xml with the approved notes,
    then merge the prepared release commit into main after the full verification.
-4. Only with explicit authorization, create `release/<version>` at that exact
-   main commit and manually dispatch with confirmation `publish-github-release`.
+4. Once main CI is green, push `release/<version>` at that exact main commit and
+   dispatch it yourself with confirmation `publish-github-release`; do not hand
+   the command back to the owner. Watch the run and confirm the release ZIP.
    The shared workflow checks main ancestry, branch/version identity, release
    dependencies, verifier findings and ZIP identity before making a tag/release.
 5. Marketplace upload remains a second, separate owner-authorized action. Upload

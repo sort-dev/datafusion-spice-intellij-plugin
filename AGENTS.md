@@ -19,3 +19,9 @@
   errors on 262/263. Shared-library tests alone are not consumer qualification.
 - Never copy another plugin's internal-API exemptions. Publication and pushes
   require explicit owner authorization. Local build success does not grant it.
+- An owner request to do a release is the authorization for the whole GitHub
+  release. After the gates and green main CI, push `release/<version>`, then
+  dispatch it yourself:
+  `gh -R sort-dev/datafusion-spice-intellij-plugin workflow run release.yml --ref release/<version> -f authorization=publish-github-release`.
+  Then watch the run and confirm the release ZIP. Do not stop to hand the owner the
+  dispatch command. Marketplace upload still needs its own explicit request.
